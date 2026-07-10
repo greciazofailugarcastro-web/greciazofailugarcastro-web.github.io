@@ -1,31 +1,375 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZODUFAX - Privacy Policy</title>
-  <style>
-    body { font-family: -apple-system, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; color: #333; }
-    h1 { color: #FF6B35; }
-    h2 { color: #4ECDC4; margin-top: 30px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Política de Privacidad · ZODUFAX</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --bg: #0a0e1a;
+    --bg-soft: #10162b;
+    --line: #1e2742;
+    --text: #e7ebf7;
+    --text-dim: #8891ac;
+    --cyan: #35f0d0;
+    --magenta: #ff3d9a;
+    --amber: #ffb347;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a{ color: var(--cyan); }
+
+  .wrap{
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position: relative;
+    padding: 72px 0 48px;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+  }
+  .hero::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: radial-gradient(ellipse 60% 60% at 85% 10%, black 5%, transparent 70%);
+    opacity: .5;
+  }
+
+  .eyebrow{
+    position: relative;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin: 0 0 12px;
+  }
+
+  h1{
+    position: relative;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(30px, 4.6vw, 40px);
+    line-height: 1.1;
+    margin: 0 0 14px;
+    max-width: 520px;
+  }
+  h1 span{ color: var(--magenta); }
+
+  .hero p{
+    position: relative;
+    color: var(--text-dim);
+    max-width: 480px;
+    margin: 0;
+    font-size: 15px;
+  }
+
+  .updated{
+    position: relative;
+    display: inline-block;
+    margin-top: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: var(--text-dim);
+    border: 1px solid var(--line);
+    background: var(--bg-soft);
+    padding: 6px 12px;
+    border-radius: 8px;
+  }
+
+  /* ---------- TOC ---------- */
+  .toc{
+    padding: 32px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .toc-list{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style: none;
+    padding: 0; margin: 0;
+  }
+  .toc-list a{
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    text-decoration: none;
+    color: var(--text-dim);
+    border: 1px solid var(--line);
+    padding: 6px 12px;
+    border-radius: 20px;
+    transition: border-color .15s ease, color .15s ease;
+  }
+  .toc-list a:hover{ border-color: var(--cyan); color: var(--cyan); }
+
+  /* ---------- SECTIONS ---------- */
+  section{
+    padding: 44px 0;
+    border-bottom: 1px solid var(--line);
+    scroll-margin-top: 24px;
+  }
+  section:last-of-type{ border-bottom: none; }
+
+  .num{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--magenta);
+    letter-spacing: .06em;
+  }
+
+  h2{
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 21px;
+    margin: 6px 0 18px;
+  }
+
+  p{ color: var(--text); font-size: 15px; margin: 0 0 14px; }
+  p.dim{ color: var(--text-dim); }
+
+  ul.plain{
+    margin: 0 0 14px;
+    padding-left: 20px;
+  }
+  ul.plain li{
+    font-size: 15px;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  ul.plain li b{ color: var(--text); }
+
+  /* data table cards */
+  .data-cards{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px;
+    margin: 8px 0 6px;
+  }
+  .data-card{
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .data-card .service{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--cyan);
+    margin-bottom: 8px;
+  }
+  .data-card .purpose{ font-size: 14px; color: var(--text-dim); }
+
+  .callout{
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--text-dim);
+  }
+  .callout .dot{
+    flex: 0 0 8px;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--amber);
+    margin-top: 6px;
+    box-shadow: 0 0 8px var(--amber);
+  }
+
+  .contact-card{
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+  .contact-card div .label{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .contact-card div .value a{ color: var(--text); text-decoration: none; }
+  .contact-card div .value a:hover{ color: var(--cyan); }
+
+  footer{
+    padding: 32px 0 56px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  footer a{ color: var(--text-dim); }
+
+  @media (max-width: 560px){
+    .contact-card{ flex-direction: column; gap: 16px; }
+  }
+</style>
 </head>
 <body>
-  <h1>ZODUFAX - Privacy Policy</h1>
-  <p><strong>Last updated:</strong> July 3, 2026</p>
-  <h2>1. Information We Collect</h2>
-  <p>ZODUFAX collects minimal data to provide its services. We may collect: device identifiers for advertising purposes, gameplay data such as scores and streaks stored locally on your device, and anonymous usage statistics.</p>
-  <h2>2. Advertising</h2>
-  <p>ZODUFAX uses Google AdMob to display advertisements. AdMob may collect and use data to serve personalized ads. You can purchase the "No Ads" option to remove all advertisements permanently.</p>
-  <h2>3. Firebase</h2>
-  <p>We use Firebase for real-time multiplayer features (Duel mode) and push notifications. Firebase may collect anonymous usage data to improve app performance.</p>
-  <h2>4. In-App Purchases</h2>
-  <p>ZODUFAX offers in-app purchases processed securely through Apple's App Store. We do not store your payment information.</p>
-  <h2>5. Data Storage</h2>
-  <p>Your game progress, XP, streaks, and preferences are stored locally on your device using SharedPreferences. We do not sell or share your personal data with third parties.</p>
-  <h2>6. Children's Privacy</h2>
-  <p>ZODUFAX is suitable for all ages. We do not knowingly collect personal information from children under 13.</p>
-  <h2>7. Contact</h2>
-  <p>If you have questions about this Privacy Policy, contact us at: <a href="mailto:greciazofailugarcastro@gmail.com">greciazofailugarcastro@gmail.com</a></p>
+
+  <div class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Documento legal</p>
+      <h1>Tu privacidad,<br>explicada sin <span>letra pequeña</span>.</h1>
+      <p>Cómo ZODUFAX recopila, usa y protege tu información al jugar.</p>
+      <span class="updated">Última actualización · 10 de julio de 2026</span>
+    </div>
+  </div>
+
+  <div class="toc">
+    <div class="wrap">
+      <ul class="toc-list">
+        <li><a href="#recopilamos">Qué recopilamos</a></li>
+        <li><a href="#terceros">Servicios de terceros</a></li>
+        <li><a href="#uso">Cómo lo usamos</a></li>
+        <li><a href="#menores">Menores de edad</a></li>
+        <li><a href="#derechos">Tus derechos</a></li>
+        <li><a href="#seguridad">Seguridad</a></li>
+        <li><a href="#cambios">Cambios</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <section id="recopilamos">
+      <div class="num">01</div>
+      <h2>Qué información recopilamos</h2>
+      <p>ZODUFAX está diseñado para funcionar con la menor cantidad de datos posible. Esto es lo que sí recopilamos:</p>
+      <ul class="plain">
+        <li><b>Datos de progreso del juego:</b> puzzles resueltos, mejor tiempo, racha diaria y nivel de experiencia. Se guardan en tu dispositivo y, si usas el modo Duelo, en nuestros servidores para sincronizar la partida en tiempo real.</li>
+        <li><b>Identificador de dispositivo:</b> usado por nuestros proveedores de publicidad y análisis para mostrar anuncios relevantes y medir el rendimiento de la app.</li>
+        <li><b>Datos de compra:</b> si adquieres el modo Premium o eliminas anuncios, procesamos la transacción a través de Apple/Google — nosotros no almacenamos datos de tu tarjeta.</li>
+        <li><b>Token de notificaciones push:</b> solo si activas los recordatorios del Desafío del día.</li>
+      </ul>
+      <p class="dim">No solicitamos tu nombre real, correo ni número de teléfono para jugar.</p>
+    </section>
+
+    <section id="terceros">
+      <div class="num">02</div>
+      <h2>Servicios de terceros que usamos</h2>
+      <p>ZODUFAX se apoya en estos proveedores para funcionar correctamente:</p>
+      <div class="data-cards">
+        <div class="data-card">
+          <div class="service">Google AdMob</div>
+          <div class="purpose">Muestra los anuncios que financian la versión gratuita.</div>
+        </div>
+        <div class="data-card">
+          <div class="service">Google Firebase</div>
+          <div class="purpose">Sincroniza las partidas del modo Duelo en tiempo real.</div>
+        </div>
+        <div class="data-card">
+          <div class="service">Apple / Google Play</div>
+          <div class="purpose">Procesan las compras dentro de la app de forma segura.</div>
+        </div>
+      </div>
+      <p class="dim">Cada uno de estos servicios tiene su propia política de privacidad, que puedes consultar en sus sitios oficiales.</p>
+    </section>
+
+    <section id="uso">
+      <div class="num">03</div>
+      <h2>Cómo usamos tu información</h2>
+      <ul class="plain">
+        <li>Para que tu progreso se guarde entre sesiones de juego.</li>
+        <li>Para sincronizar partidas en el modo Duelo en tiempo real.</li>
+        <li>Para mostrar anuncios y medir su rendimiento (solo en la versión gratuita).</li>
+        <li>Para enviarte el recordatorio del Desafío del día, si activaste las notificaciones.</li>
+        <li>Para detectar errores técnicos y mejorar la estabilidad del juego.</li>
+      </ul>
+      <p class="dim">Nunca vendemos tu información a terceros, ni la usamos con fines distintos a los descritos aquí.</p>
+    </section>
+
+    <section id="menores">
+      <div class="num">04</div>
+      <h2>Uso por menores de edad</h2>
+      <p>ZODUFAX es un juego apto para todo público. No solicitamos ni recopilamos intencionalmente datos personales identificables de menores. Si eres padre o tutor y crees que tu hijo/a nos ha proporcionado información personal, escríbenos y la eliminaremos.</p>
+    </section>
+
+    <section id="derechos">
+      <div class="num">05</div>
+      <h2>Tus derechos</h2>
+      <p>Puedes en cualquier momento:</p>
+      <ul class="plain">
+        <li>Solicitar que eliminemos los datos de progreso asociados a tu dispositivo.</li>
+        <li>Desactivar las notificaciones push desde Ajustes.</li>
+        <li>Restaurar el identificador de publicidad de tu dispositivo desde la configuración de iOS/Android.</li>
+        <li>Escribirnos para preguntar exactamente qué datos tenemos sobre tu dispositivo.</li>
+      </ul>
+    </section>
+
+    <section id="seguridad">
+      <div class="num">06</div>
+      <h2>Seguridad de los datos</h2>
+      <p>Tus datos de progreso se transmiten mediante conexiones cifradas (HTTPS) hacia Firebase. Ningún sistema es 100% infalible, pero aplicamos las prácticas estándar de la industria para proteger tu información.</p>
+      <div class="callout">
+        <span class="dot"></span>
+        <span>ZODUFAX no almacena contraseñas, datos bancarios ni información de identidad — no los necesitamos para que juegues.</span>
+      </div>
+    </section>
+
+    <section id="cambios">
+      <div class="num">07</div>
+      <h2>Cambios a esta política</h2>
+      <p>Si actualizamos esta política, publicaremos la nueva versión en esta misma página con la fecha de actualización visible arriba. Te recomendamos revisarla ocasionalmente.</p>
+    </section>
+
+    <section id="contacto">
+      <div class="num">08</div>
+      <h2>Contacto</h2>
+      <p>¿Preguntas sobre esta política o sobre tus datos? Escríbenos directamente.</p>
+      <div class="contact-card">
+        <div>
+          <div class="label">Correo</div>
+          <div class="value"><a href="mailto:greciazofailugarcastro@gmail.com">greciazofailugarcastro@gmail.com</a></div>
+        </div>
+        <div>
+          <div class="label">Desarrolladora</div>
+          <div class="value">Grecia Zofai Lucar Castro</div>
+        </div>
+        <div>
+          <div class="label">Más ayuda</div>
+          <div class="value"><a href="./support-zodufax.html">Centro de soporte</a></div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <div class="wrap">© 2026 Grecia Lucar — ZODUFAX</div>
+  </footer>
+
 </body>
 </html>
