@@ -1,69 +1,724 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NB Computers CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a working business tool, calm and exact, like the shipped CRM in the proposal
+   IDEA: the NB Computers back office: one card per customer, every order traceable
+   PICTURE: the live app itself, opening on the dashboard mid-day
+   COLOUR and TYPE: NB navy sidebar, white work surface, amber for anything waiting on a person; Inter + Space Grotesk numbers
+   LAYOUT: sidebar + work area; stacks under 860px */
+:root{color-scheme:light dark;
+--bg:light-dark(#f3f5f8,#0f141b);--card:light-dark(#fff,#18202b);--ink:light-dark(#152132,#e6ebf2);--mut:light-dark(#5d6b7e,#9aa7b8);
+--line:light-dark(#e1e6ee,#2a3442);--soft:light-dark(#f7f9fc,#1d2733);--nav:#16304f;--nav2:#21406a;--pri:#1e3a5f;--acc:#3b82c4;
+--amb:light-dark(#fff6e3,#3a2d12);--ambk:light-dark(#8a5a0b,#f3c46b);--grn:light-dark(#e5f6ec,#11301f);--grnk:light-dark(#17703d,#7ddc9f);
+--red:light-dark(#fdecec,#3a1717);--redk:light-dark(#a32020,#ff9b9b);--blu:light-dark(#e8f0fb,#14263d);--bluk:light-dark(#1d4f91,#93c0f5);
+--vio:light-dark(#f1ecfd,#261d3d);--viok:light-dark(#5b35b5,#c3adff)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,sans-serif;overflow-x:clip}
+button,input,select,textarea{font:inherit;color:inherit}
+h1{font:700 22px/1.2 'Space Grotesk',Inter,sans-serif;margin:0}
+h2{font:600 15px/1.3 Inter,sans-serif;margin:0 0 10px}
+.app{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh}
+.side{background:var(--nav);color:#cbd8e8;padding:16px 0;position:sticky;top:0;height:100vh;overflow:auto}
+.logo{display:flex;gap:10px;align-items:center;padding:0 18px 16px;color:#fff;font-weight:700}
+.logo i{width:32px;height:32px;border-radius:9px;background:var(--acc);display:grid;place-items:center;font-style:normal;font-size:13px}
+.side .sec{font-size:11px;color:#86a0c0;padding:14px 18px 6px}
+.side button{display:flex;width:100%;align-items:center;gap:10px;padding:8px 18px;border:0;background:none;color:#cbd8e8;text-align:left;cursor:pointer;font-size:13.5px}
+.side button:hover{background:#1c3a60}
+.side button.on{background:var(--nav2);color:#fff;box-shadow:inset 3px 0 #7fb5ee}
+.side .cnt{margin-left:auto;background:#f0b44a;color:#3a2600;border-radius:10px;font-size:11px;font-weight:700;padding:0 7px}
+.top{display:flex;gap:10px;align-items:center;padding:10px 22px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.search{flex:1;white-space:nowrap;overflow:hidden;max-width:520px;height:38px;border:1px solid var(--line);border-radius:9px;background:var(--soft);display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--mut);cursor:pointer}
+.search kbd{margin-left:auto;font:12px Inter;border:1px solid var(--line);border-radius:5px;padding:0 6px}
+.sp{flex:1}
+.main{padding:20px 22px 60px;max-width:1320px}
+.btn{height:36px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:var(--card);font-weight:600;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:var(--acc)}.btn:focus-visible,.side button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}.btn.ok{background:#178a46;border-color:#178a46;color:#fff}
+.btn.warn{background:var(--amb);color:var(--ambk);border-color:#e9c26f}.btn.sm{height:30px;padding:0 10px;font-size:12px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.who{display:flex;align-items:center;gap:8px}
+.who select{height:36px;border:1px solid var(--line);border-radius:8px;background:var(--card);padding:0 8px}
+.bell{position:relative}.bell b{position:absolute;top:-6px;right:-6px;background:#d33;color:#fff;border-radius:10px;font-size:10px;padding:0 5px}
+.hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.crumb{font-size:12px;color:var(--mut);margin-bottom:4px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card.p0{padding:0;overflow:hidden}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.side2{grid-template-columns:minmax(0,1fr) 360px}
+.kpi{font:700 28px/1.1 'Space Grotesk',sans-serif}.lab{font-size:12px;color:var(--mut)}
+table{width:100%;border-collapse:collapse}
+th{font-size:11.5px;text-align:left;color:var(--mut);font-weight:600;padding:9px 12px;border-bottom:1px solid var(--line);background:var(--soft)}
+td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--soft)}
+.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tag{display:inline-block;font-size:11.5px;font-weight:600;border-radius:12px;padding:2px 9px;white-space:nowrap}
+.t-amb{background:var(--amb);color:var(--ambk)}.t-grn{background:var(--grn);color:var(--grnk)}.t-red{background:var(--red);color:var(--redk)}.t-blu{background:var(--blu);color:var(--bluk)}.t-vio{background:var(--vio);color:var(--viok)}.t-gry{background:var(--soft);color:var(--mut);border:1px solid var(--line)}
+.f{display:flex;flex-direction:column;gap:4px}.f label{font-size:12px;color:var(--mut);font-weight:600}
+.in{height:38px;border:1px solid var(--line);border-radius:8px;background:var(--card);padding:0 10px;font-size:14px;width:100%}
+textarea.in{height:72px;padding:8px 10px}
+.mut{color:var(--mut)}.small{font-size:12px}
+.alert{border-radius:10px;padding:10px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.a-amb{background:var(--amb);color:var(--ambk);border:1px solid #e9c26f}.a-red{background:var(--red);color:var(--redk);border:1px solid #eaa}.a-blu{background:var(--blu);color:var(--bluk);border:1px solid #a9c8ef}.a-grn{background:var(--grn);color:var(--grnk);border:1px solid #9bd8b2}
+.tl{border-left:2px solid var(--line);margin-left:6px;padding-left:14px}
+.tl div{position:relative;padding-bottom:10px}.tl div::before{content:"";position:absolute;left:-20px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--card);border:2px solid var(--acc)}
+.tl small{display:block;color:var(--mut);font-size:11.5px}
+.kan{display:grid;grid-template-columns:repeat(6,minmax(170px,1fr));gap:10px;overflow-x:auto}
+.col{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:8px;min-height:300px}
+.col.drop{outline:2px dashed var(--acc)}
+.kc{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;cursor:grab}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:14px;flex-wrap:wrap}
+.tabs button{border:0;background:none;padding:9px 14px;font-weight:600;color:var(--mut);cursor:pointer}.tabs button.on{color:var(--ink);box-shadow:inset 0 -2px var(--pri)}
+.bar{height:8px;background:var(--line);border-radius:5px;overflow:hidden}.bar b{display:block;height:100%;background:var(--acc)}
+.ov{position:fixed;inset:0;background:rgba(10,20,35,.5);display:grid;place-items:start center;padding:6vh 16px;z-index:50;overflow:auto}
+.md{background:var(--card);border-radius:14px;width:min(720px,100%);box-shadow:0 30px 70px rgba(0,0,0,.35)}
+.md.wide{width:min(1060px,100%)}
+.mdh{display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}.mdb{padding:16px 18px}.mdf{display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid var(--line)}
+.x{margin-left:auto;border:0;background:none;font-size:20px;cursor:pointer;color:var(--mut)}
+#toast{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:8px;z-index:60}
+#toast div{background:#152132;color:#fff;border-radius:10px;padding:10px 14px;box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:380px;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+@media (prefers-reduced-motion:reduce){#toast div{animation:none}}
+.pal input{border:0;border-bottom:1px solid var(--line);width:100%;font-size:18px;padding:16px 18px;background:none;outline:none}
+.pal .it{display:flex;gap:10px;align-items:center;padding:9px 18px;cursor:pointer}.pal .it.sel,.pal .it:hover{background:var(--blu)}
+.portal{background:var(--card);border-radius:14px;overflow:hidden}
+.pbar{background:var(--soft);padding:8px 14px;font-size:12px;color:var(--mut);border-bottom:1px solid var(--line)}
+.ph{width:92px;height:74px;border-radius:8px;background:linear-gradient(135deg,#dfe6ef,#c3cfdd);display:grid;place-items:center;color:#5d6b7e;font-size:11px;flex-shrink:0}
+.ph svg{width:56px;height:46px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.chk{display:flex;gap:8px;align-items:center;padding:4px 0}
+.ok-i{color:var(--grnk);font-weight:700}.ko-i{color:var(--redk);font-weight:700}
+.empty{padding:26px;text-align:center;color:var(--mut)}
+
+.av{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;font-size:10.5px;font-weight:700;color:#fff;flex-shrink:0;vertical-align:middle;margin-right:6px}
+.fade{animation:fin .28s ease}@keyframes fin{from{opacity:0;transform:translateY(6px)}}
+@media (prefers-reduced-motion:reduce){.fade{animation:none}}
+.hero{background:linear-gradient(120deg,#16304f 0%,#1e4a7a 60%,#2e809d 100%);color:#fff;border-radius:16px;padding:22px 24px;margin-bottom:14px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.hero h1{color:#fff;font-size:26px}.hero p{margin:4px 0 0;color:#cfe0f3}
+.hero .btn{background:#fff;color:#16304f;border-color:#fff}
+.hbar{display:grid;grid-template-columns:110px 1fr 90px;gap:10px;align-items:center;margin:7px 0;font-size:12.5px}
+.hbar .bar{height:12px}.hbar .bar b{border-radius:5px}
+.stp{display:flex;gap:0;margin:4px 0 14px;overflow-x:auto}
+.stp div{flex:1;min-width:110px;text-align:center;font-size:11.5px;color:var(--mut);position:relative;padding-top:26px}
+.stp div::before{content:"";position:absolute;top:8px;left:0;right:0;height:3px;background:var(--line)}
+.stp div::after{content:attr(data-n);position:absolute;top:0;left:50%;transform:translateX(-50%);width:20px;height:20px;border-radius:50%;background:var(--card);border:2px solid var(--line);font-size:10px;line-height:16px;font-weight:700}
+.stp div.done{color:var(--ink)}.stp div.done::before{background:#2e9d5b}.stp div.done::after{background:#2e9d5b;border-color:#2e9d5b;color:#fff;content:"✓"}
+.stp div.cur{color:var(--ink);font-weight:700}.stp div.cur::before{background:linear-gradient(90deg,#2e9d5b 50%,var(--line) 50%)}.stp div.cur::after{border-color:var(--acc);background:var(--acc);color:#fff}
+#tour{position:fixed;left:250px;bottom:20px;z-index:80;width:min(430px,calc(100vw - 32px));background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.3);padding:16px 18px;display:none}
+#tour .tn{font-size:11.5px;color:var(--acc);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+#tour h3{margin:4px 0 6px;font:700 17px/1.25 'Space Grotesk',Inter,sans-serif}
+#tour p{margin:0 0 12px;color:var(--mut);font-size:13.5px}
+#tour .pg{height:4px;background:var(--line);border-radius:3px;margin-bottom:12px;overflow:hidden}#tour .pg b{display:block;height:100%;background:var(--acc);transition:width .3s}
+.bnav{display:none}
+.icn{width:36px;padding:0;justify-content:center}
+#cap{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:rgba(13,26,44,.92);color:#fff;border-radius:12px;padding:12px 20px;font-size:17px;font-weight:600;max-width:900px;text-align:center;z-index:70;display:none;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+#cap small{display:block;font-weight:500;font-size:13px;color:#b9cbe2}
+@media(max-width:860px){.app{grid-template-columns:1fr}.side{display:none}.g3,.g4,.side2{grid-template-columns:1fr 1fr}.top{flex-wrap:wrap;padding:10px 12px}.top .who span,.top #btn-nuovo,.search kbd{display:none}.search{order:5;flex-basis:100%;max-width:none}.who select{max-width:170px}
+.main{padding-bottom:96px}.bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--card);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+.bnav button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;color:var(--mut);padding:4px 0;cursor:pointer}.bnav button i{font-style:normal;font-size:19px;line-height:1}.bnav button.on{color:var(--acc);font-weight:700}
+#tour{left:12px;right:12px;bottom:76px;width:auto}.kan{grid-template-columns:repeat(6,78vw)}.stp div{min-width:64px;font-size:10px}.hero{padding:18px}.hero h1{font-size:21px}}
+@media(max-width:600px){.g2,.g3,.side2{grid-template-columns:1fr}.g4{grid-template-columns:1fr 1fr}.kpi{font-size:22px}.hero .btn{flex:1;justify-content:center}.main{padding:14px}.stack thead{display:none}.stack tr{display:grid;padding:8px 0}.stack td{border:0;padding:2px 12px}}
+@media print{.side,.top,#toast{display:none}}
+</style>
 </head>
 <body>
+<div id="root"></div>
+<div id="modal"></div>
+<div id="toast"></div>
+<div id="cap"></div>
+<div id="tour" role="dialog" aria-label="Demo guidata"></div>
+<script>
+{
+/* ---------- utilità ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const eur=n=>'€ '+(Math.round(n*100)/100).toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pad=(n,l=3)=>String(n).padStart(l,'0');
+let clock=new Date(2026,10,20,9,30);
+const now=()=>{clock=new Date(clock.getTime()+7*60000);return clock;};
+const fmt=d=>{d=new Date(d);return pad(d.getDate(),2)+'/'+pad(d.getMonth()+1,2)+' '+pad(d.getHours(),2)+':'+pad(d.getMinutes(),2)};
+const day=d=>{d=new Date(d);return pad(d.getDate(),2)+'/'+pad(d.getMonth()+1,2)+'/'+d.getFullYear()};
+const IVA=0.22;
+const PC_SVG='<svg viewBox="0 0 56 46"><rect x="16" y="2" width="24" height="40" rx="3" fill="#8fa2ba"/><rect x="19" y="6" width="18" height="3" rx="1" fill="#dfe6ef"/><circle cx="28" cy="34" r="3" fill="#dfe6ef"/></svg>';
+const MON_SVG='<svg viewBox="0 0 56 46"><rect x="4" y="4" width="48" height="30" rx="3" fill="#8fa2ba"/><rect x="8" y="8" width="40" height="22" fill="#dfe6ef"/><rect x="24" y="34" width="8" height="6" fill="#8fa2ba"/><rect x="16" y="40" width="24" height="3" rx="1" fill="#8fa2ba"/></svg>';
+const PRN_SVG='<svg viewBox="0 0 56 46"><rect x="14" y="4" width="28" height="12" fill="#dfe6ef" stroke="#8fa2ba"/><rect x="6" y="14" width="44" height="20" rx="3" fill="#8fa2ba"/><rect x="14" y="28" width="28" height="14" fill="#fff" stroke="#8fa2ba"/></svg>';
 
-    <!-- 
-        
-        <div>...</div>
-        <a href="...">...</a>
-        <p>...</p>
-        <br>
-        <hr>
-        <table>...</table>
-        <img src"...">
-        <form action="..." method="get / post">
-            <input name="..." type="text">
-            <button>...</button>
-        </form>
-        <input>
-          
-    -->
-    <h1>Esercizio javascript</h1>
-    <hr>
+/* ---------- dati di esempio ---------- */
+const ROLES={admin:'Amministratore',comm:'Commerciale',acc:'Accoglienza e banco',amm:'Amministrazione',log:'Logistica e acquisti',tec:'Tecnico',est:'Commercialista (esterno)'};
+const USERS=[{id:'nb',n:'N. Bartoli',r:'admin'},{id:'mb',n:'M. Bianchi',r:'comm'},{id:'lv',n:'L. Verdi',r:'comm'},{id:'rg',n:'R. Gialli',r:'acc'},{id:'ac',n:'A. Conti',r:'amm'},{id:'sc',n:'S. Conti',r:'log'},{id:'lm',n:'L. Marini',r:'tec'},{id:'st',n:'Studio Rinaldi',r:'est'}];
+const SEDI=['Centrale','Sede 1','Sede 2','Sede 3'];
+const LISTINI=['Privati','Aziende A','Aziende B'];
+const NAV=[
+ ['dash','Panoramica','*'],['clienti','Clienti','admin comm acc amm'],['richieste','Richieste','admin comm acc'],['trattative','Trattative','admin comm'],['calendario','Calendario','admin comm acc tec log'],
+ ['preventivi','Preventivi','admin comm acc amm'],['catalogo','Catalogo','admin comm acc log tec'],
+ ['§','Ordine e magazzino'],['ordini','Ordini clienti','admin comm amm log tec'],['magazzini','Magazzini','admin log tec acc'],['fornitori','Fornitori e telefonate','admin log tec'],['assemblaggio','Assemblaggio','admin tec log'],
+ ['§','Amministrazione'],['commercialista','Commercialista','admin amm est'],['impostazioni','Impostazioni','admin'],['registro','Registro modifiche','admin']];
 
-    <br>
+function seed(){
+ const C={};
+ const items=[
+  {c:'CPU-I7-14',n:'Processore Intel Core i7 14ª gen',t:'componente',costo:310,p:[389,379,379]},
+  {c:'RAM-32-D5',n:'Memoria DDR5 32 GB',t:'componente',costo:95,p:[129,125,125]},
+  {c:'SSD-NV-1T',n:'SSD NVMe 1 TB',t:'componente',costo:68,p:[99,95,95]},
+  {c:'GPU-4060',n:'Scheda video RTX 4060 8 GB',t:'componente',costo:289,p:[369,359,359]},
+  {c:'PSU-650',n:'Alimentatore 650 W',t:'componente',costo:55,p:[79,75,75]},
+  {c:'CASE-MT',n:'Case midi tower',t:'componente',costo:45,p:[69,65,65]},
+  {c:'LIC-W11',n:'Licenza Windows 11 Pro',t:'componente',costo:110,p:[145,140,140]},
+  {c:'PC-WS-140',n:'Workstation NB Pro 14',t:'config',costo:0,p:[1390,1290,1320],sc:5,bom:[['CPU-I7-14',1],['RAM-32-D5',2],['SSD-NV-1T',1],['GPU-4060',1],['PSU-650',1],['CASE-MT',1],['LIC-W11',1]],img:'pc'},
+  {c:'MON-27Q',n:'Monitor 27" QHD',t:'finito',costo:175,p:[259,245,239],sc:5,img:'mon'},
+  {c:'SRV-INST',n:'Installazione e configurazione in sede',t:'servizio',costo:200,p:[450,450,450],sc:0},
+  {c:'NOL-MFA3',n:'Multifunzione A3 a noleggio · 36 mesi',t:'noleggio',costo:52,p:[89,89,89],sc:0,durata:36,img:'prn'},
+  {c:'GEST-TEAM',n:'Gestionale Team in cloud · per utente',t:'canone',costo:9,p:[13,13,13],sc:0,durata:12},
+  {c:'M365-BS',n:'Microsoft 365 Business Standard · per utente',t:'canone',costo:9.4,p:[11.7,11.7,11.7],sc:0,durata:12}];
+ items.forEach(i=>{i.sc=i.sc??10;C[i.c]=i});
+ const st={};const set=(c,s,q)=>{st[c]=st[c]||{};st[c][s]=q};
+ Object.keys(C).forEach(c=>SEDI.forEach(s=>set(c,s,0)));
+ [['CPU-I7-14','Centrale',5],['CPU-I7-14','Sede 3',2],['RAM-32-D5','Centrale',6],['RAM-32-D5','Sede 1',4],['SSD-NV-1T','Centrale',2],['SSD-NV-1T','Sede 1',2],['SSD-NV-1T','Sede 2',1],
+  ['GPU-4060','Centrale',3],['GPU-4060','Sede 1',1],['GPU-4060','Sede 2',1],['PSU-650','Centrale',5],['CASE-MT','Sede 2',5],['LIC-W11','Centrale',10],['MON-27Q','Centrale',4],['MON-27Q','Sede 3',6]].forEach(a=>set(...a));
+ return {
+  me:'nb',view:'dash',sel:null,tab:'dati',seq:{R:118,PV:41,OC:400,TR:86,PO:230,DT:86,TEL:12,DOC:20,AS:44,SN:40},
+  catalog:C, stock:st,
+  riserve:[{id:'RS-1',ord:'OC-399',code:'SSD-NV-1T',sede:'Sede 2',qty:1,tec:'lm'}],
+  clienti:[
+   {id:'C1',tipo:'Azienda',nome:'Rossi Impianti Srl',piva:'04512780487',tel:'055 123 4567',email:'info@rossiimpianti.it',sdi:'',pec:'',listino:'Aziende B',resp:'mb',canale:'Telefono',ind:'Via Pistoiese 112, 50145 Firenze',ref:[['Marco Verdi','Titolare','055 123 4567','m.verdi@rossiimpianti.it'],['Anna Neri','Acquisti','055 123 4568','a.neri@rossiimpianti.it']],st:[[ '2026-11-06T11:40','Richiesta registrata da telefono','R. Gialli'],['2026-11-10T15:00','Appuntamento in sede','M. Bianchi']]},
+   {id:'C2',tipo:'Azienda',nome:'Studio Legale Ferri',piva:'05820010489',tel:'055 240 1188',email:'segreteria@studioferri.it',sdi:'KRRH6B9',pec:'',listino:'Aziende A',resp:'lv',canale:'Email',ind:'Viale Matteotti 8, Firenze',ref:[['Paolo Ferri','Titolare','055 240 1188','p.ferri@studioferri.it']],st:[]},
+   {id:'C3',tipo:'Privato',nome:'Giulia Martini',piva:'',tel:'347 112 9087',email:'giulia.martini@mail.it',sdi:'0000000',pec:'',listino:'Privati',resp:'rg',canale:'Sito web',ind:'',ref:[],st:[]},
+   {id:'C4',tipo:'Azienda',nome:'Hotel Arno Srl',piva:'06173320482',tel:'055 210 5566',email:'direzione@hotelarno.it',sdi:'M5UXCR1',pec:'',listino:'Aziende B',resp:'lv',canale:'Telefono',ind:'Lungarno 12, Firenze',ref:[],st:[]},
+   {id:'C5',tipo:'Azienda',nome:'Farmacia San Marco Snc',piva:'',tel:'055 471 220',email:'info@farmaciasanmarco.it',sdi:'',pec:'',listino:'Aziende B',resp:'mb',canale:'Telefono',ind:'',ref:[],st:[]}],
+  richieste:[
+   {id:'R-2026-118',cli:'C1',titolo:'Sostituzione 5 PC ufficio tecnico',canale:'Telefono',stato:'In valutazione',resp:'mb',prio:'Urgente',descr:'5 postazioni CAD, 2 monitor ciascuna, installazione in sede, stampante A3 e gestionale per 5 utenti.'},
+   {id:'R-2026-117',cli:'C3',titolo:'Portatile per università',canale:'Sito web',stato:'Assegnata',resp:'rg',descr:'Portatile leggero, budget circa 800 €.'}],
+  trattative:[
+   {id:'T1',cli:'C4',titolo:'Wi-Fi + 3 PC reception',fase:'contatto',val:4800,resp:'lv',prob:30,next:'Richiamare il direttore',quando:'2026-11-20'},
+   {id:'T2',cli:'C2',titolo:'Licenze Microsoft 365',fase:'attesa',val:1140,resp:'lv',prob:70,next:'Sollecito risposta',quando:'2026-11-25'},
+   {id:'T3',cli:'C5',titolo:'Server + backup',fase:'valutazione',val:3100,resp:'mb',ferma:true,prob:40,next:'Presentazione proposta',quando:'2026-11-24'}],
+  preventivi:[],ordini:[{id:'OC-399',cli:'C4',stato:'In assemblaggio',righe:[],note:'Commessa di esempio già in lavorazione',tec:'lm'}],
+  trasf:[],po:[],calls:[
+   {id:'TEL-011',q:'2026-11-18T16:10',forn:'Beta Informatica',chi:'sc',reg:'sc',comm:'OC-399',esito:'Disponibilità confermata per 1 SSD',orig:'Manuale'}],
+  docs:[],avvisi:[],log:[],
+  fornitori:[{n:'Alfa Distribuzione',gg:3,k:1},{n:'Beta Informatica',gg:2,k:1.03},{n:'Gamma Components',gg:5,k:0.97}],
+  regole:{comm:{sc:5,imp:15000},acc:{sc:0,imp:1500},amm:{sc:0,imp:2500},log:{sc:0,imp:0},tec:{sc:0,imp:0},admin:{sc:100,imp:1e9},margine:15,promemoria:4,vice:'lv'},
+  stampanti:[
+   {n:'Multifunzione A3 Ufficio',conn:'AirPrint · Wi-Fi',sede:'Centrale',prop:'Leasing',gest:'Alfa Leasing S.r.l.',contr:'LS-2024-118',scad:'2027-06-30',canone:79,on:true},
+   {n:'Laser B/N Sede 2',conn:'Rete · 192.168.1.40',sede:'Sede 2',prop:'Noleggio',gest:'Beta Office Service',contr:'N-0932',scad:'2027-01-15',canone:39,on:true},
+   {n:'Etichette DDT',conn:'Bluetooth',sede:'Sede 1',prop:'Di proprietà',gest:'',contr:'',scad:'',canone:0,on:true}],
+  dispClienti:[{cli:'Studio Legale Ferri',disp:'3 portatili in leasing',gest:'Alfa Leasing S.r.l.',scad:'2027-03-31',canone:120}],
+  stampe:[],fR:'Aperte',
+  appunt:[{q:'2026-11-20T11:00',titolo:'Sopralluogo ufficio tecnico',cli:'C1',chi:'mb',tipo:'Appuntamento'},{q:'2026-11-20T16:30',titolo:'Richiamare per Wi-Fi',cli:'C4',chi:'lv',tipo:'Richiamo'},{q:'2026-11-21T09:30',titolo:'Consegna portatile',cli:'C3',chi:'rg',tipo:'Consegna'},{q:'2026-11-23T14:00',titolo:'Installazione Microsoft 365',cli:'C2',chi:'lm',tipo:'Installazione'},{q:'2026-11-24T10:00',titolo:'Presentazione server e backup',cli:'C5',chi:'mb',tipo:'Appuntamento'}]
+ };
+}
+let S=seed();
+const save=()=>{try{localStorage.setItem('nbcrm',JSON.stringify(S))}catch(e){}};
+try{const x=localStorage.getItem('nbcrm');if(x)S=Object.assign(seed(),JSON.parse(x))}catch(e){}
 
-    <button onclick="loadData()">Carica dati</button>
-    <button onclick="test()">test</button>
-    <br>
-    <a href="users.html">Vai alla pagina utenti</a>
-    <br>
+/* ---------- accessori ---------- */
+const U=id=>USERS.find(u=>u.id===id)||{n:id,r:''};
+const ME=()=>U(S.me);
+const R=()=>ME().r;
+const CL=id=>S.clienti.find(c=>c.id===id);
+const IT=c=>S.catalog[c];
+const can=v=>{const e=NAV.find(x=>x[0]===v);return e&&(e[2]==='*'||e[2].split(' ').includes(R()))};
+const toast=t=>{const box=$('#toast');while(box.children.length>1)box.firstChild.remove();const d=document.createElement('div');d.innerHTML=t;box.append(d);setTimeout(()=>d.remove(),3800)};
+const log=(t)=>{S.log.unshift({q:now(),u:ME().n,t})};
+const notify=(to,t,go)=>{S.avvisi.unshift({id:Math.random().toString(36).slice(2),to,t,go,q:now(),letto:false})};
+const nextId=(k,pre,l=3)=>{S.seq[k]++;return pre+pad(S.seq[k],l)};
+const AVC=['#2e809d','#7a4cc2','#c2702e','#2e9d5b','#c23e5b','#3b6fc4','#8a6d1f','#555'];
+const av=id=>{const u=U(id),k=USERS.findIndex(x=>x.id===id);return `<span class="av" style="background:${AVC[k%8]}" title="${esc(u.n)}">${esc(u.n.split(/[ .]+/).filter(Boolean).map(w=>w[0]).join('').slice(0,2))}</span>`};
+const ICO={dash:'◧',clienti:'☺',richieste:'✉',trattative:'▤',calendario:'▣',preventivi:'€',catalogo:'▦',ordini:'⧉',magazzini:'⌂',fornitori:'☎',assemblaggio:'⚙',commercialista:'⇪',impostazioni:'⚒',registro:'≡'};
+const tag=(t,c)=>`<span class="tag t-${c}">${esc(t)}</span>`;
+const stTag=s=>({'Bozza':'gry','In approvazione':'amb','Approvato':'blu','Inviato':'vio','Accettato':'grn','Rifiutato':'red','Confermato':'blu','In approvvigionamento':'amb','In assemblaggio':'vio','Pronto':'grn','Spedito':'grn','Consegnato':'grn','Bolla creata':'blu','Ritirato':'vio','In transito':'amb','Ricevuto':'grn','Da inviare':'amb','Dati incompleti':'red','Inviato allo studio':'blu','Registrato':'grn','Da correggere':'red','Ordinato':'blu','Ricevuto in parte':'amb'}[s]||'gry');
+const price=(code,lst)=>IT(code).p[LISTINI.indexOf(lst)];
+const unitCost=code=>{const i=IT(code);return i.bom?i.bom.reduce((a,[c,q])=>a+IT(c).costo*q,0):i.costo};
+const recurring=code=>['canone','noleggio'].includes(IT(code).t);
+function totals(q){let one=0,mon=0,cost=0,lordo=0;q.righe.forEach(r=>{const pu=price(r.code,q.listino),net=pu*r.qty*(1-r.sc/100);if(recurring(r.code))mon+=net;else{one+=net;lordo+=pu*r.qty;cost+=unitCost(r.code)*r.qty}});return{one,mon,iva:one*IVA,tot:one*(1+IVA),cost,marg:one?((one-cost)/one*100):0,lordo}}
+const libero=(code,sede)=>(S.stock[code]?.[sede]||0)-S.riserve.filter(r=>r.code===code&&r.sede===sede).reduce((a,r)=>a+r.qty,0);
+const riservato=(code,sede,ord)=>S.riserve.filter(r=>r.code===code&&r.sede===sede&&(!ord||r.ord===ord)).reduce((a,r)=>a+r.qty,0);
+const transito=(code,sede)=>S.trasf.filter(t=>t.a===sede&&t.stato!=='Ricevuto').reduce((a,t)=>a+t.righe.filter(r=>r.code===code).reduce((b,r)=>b+r.sped,0),0);
 
-    <script>
-        /*
-            esegue chiamata http per scaricare dati
-        */
-       var n = 0
-        function loadData() {
-            fetch('https://jsonplaceholder.typicode.com/posts')
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    const container = document.createElement('div');
-                    
-                    data.forEach(post => {
-                        const postElement = document.createElement('div');
-                        postElement.innerHTML = `<h2>${post.title}</h2><p>${post.body}</p>`;
-                        container.appendChild(postElement);
-                        n++
-                    });
-                    document.body.appendChild(container);
-                    console.log(`Number of posts loaded: ${n}`);
-                    const tag = document.createElement('h3');
-                    tag.innerHTML = `Number of posts loaded: ${n}`;
-                    document.body.appendChild(tag);
-                })
-                .catch(error => console.error('Error fetching data:', error));
-            }
+/* ---------- regole del preventivo ---------- */
+function motivi(q,role){
+ const rg=S.regole[role]||S.regole.comm,t=totals(q),m=[];
+ q.righe.forEach(r=>{if(r.sc>rg.sc)m.push(`Sconto ${r.sc}% su ${IT(r.code).n}: il limite del ruolo è ${rg.sc}%`)});
+ if(t.one>rg.imp)m.push(`Importo ${eur(t.one)} oltre il limite del ruolo (${eur(rg.imp)})`);
+ if(t.one&&t.marg<S.regole.margine)m.push(`Margine ${t.marg.toFixed(1)}%: sotto il minimo del ${S.regole.margine}%`);
+ return m;
+}
 
-        function test() {
-            console.log(n);
-        }
-    </script>
+/* ---------- fabbisogno dell'ordine ---------- */
+function bisogno(o){const need={};o.righe.forEach(r=>{const i=IT(r.code);if(i.bom)i.bom.forEach(([c,q])=>need[c]=(need[c]||0)+q*r.qty);else if(['componente','finito'].includes(i.t))need[r.code]=(need[r.code]||0)+r.qty});return need}
+function fabbisogno(o){const need=bisogno(o);return Object.entries(need).map(([code,q])=>{
+ const ris=riservato(code,'Centrale',o.id);
+ const tr=S.trasf.filter(t=>t.comm===o.id&&t.stato!=='Ricevuto').reduce((a,t)=>a+t.righe.filter(r=>r.code===code).reduce((b,r)=>b+r.sped,0),0);
+ const ord=S.po.filter(p=>p.comm===o.id).reduce((a,p)=>a+p.righe.filter(r=>r.code===code).reduce((b,r)=>b+r.qty-r.ric,0),0);
+ return{code,q,ris,tr,ord,manca:Math.max(0,q-ris-tr-ord)}})}
+const pronto=o=>{const f=fabbisogno(o);return f.length&&f.every(x=>x.ris>=x.q)};
+
+/* ---------- layout ---------- */
+let lastView='';
+function render(){
+ document.documentElement.dataset.theme=S.theme||'light';
+ const unread=S.avvisi.filter(a=>a.to===S.me&&!a.letto).length;
+ const badge={preventivi:S.preventivi.filter(p=>p.stato==='In approvazione').length,commercialista:S.docs.filter(d=>['Da inviare','Dati incompleti','Da correggere'].includes(d.stato)).length};
+ if(!can(S.view))S.view='dash';
+ $('#root').innerHTML=`<div class="app"><nav class="side" aria-label="Menu"><div class="logo"><i>NB</i>NB Computers CRM</div>
+ ${NAV.map(n=>n[0]==='§'?`<div class="sec">${n[1]}</div>`:(can(n[0])?`<button data-a="go" data-v="${n[0]}" class="${S.view===n[0]?'on':''}" id="nav-${n[0]}">${n[1]}${badge[n[0]]&&R()!=='est'?`<span class="cnt">${badge[n[0]]}</span>`:''}</button>`:'')).join('')}
+ </nav><div><header class="top"><div class="search" data-a="pal" id="searchbox" role="button" tabindex="0">Cerca cliente, preventivo, ordine, articolo, seriale…<kbd>⌘K</kbd></div><div class="sp"></div>
+ ${['admin','comm','acc'].includes(R())?'<button class="btn pri" data-a="nuovoCli" id="btn-nuovo">+ Nuovo cliente</button>':''}
+ <button class="btn" data-a="tour" id="btn-tour" title="Demo guidata">▶ Demo guidata</button><button class="btn icn" data-a="theme" aria-label="Tema chiaro o scuro" title="Tema">${(S.theme||'light')==='light'?'☾':'☀'}</button>
+ <button class="btn bell" data-a="avvisi" id="btn-avvisi" aria-label="Avvisi">Avvisi${unread?`<b>${unread}</b>`:''}</button>
+ <label class="who">${av(S.me)}<span class="small mut">Entra come</span><select data-ch="me" id="sel-user">${USERS.map(u=>`<option value="${u.id}" ${u.id===S.me?'selected':''}>${u.n} · ${ROLES[u.r]}</option>`).join('')}</select></label>
+ </header><main class="main ${lastView!==S.view+S.sel?'fade':''}" id="main">${(V[S.view]||V.dash)()}</main></div></div>
+ <nav class="bnav" aria-label="Menu rapido">${NAV.filter(n=>n[0]!=='§'&&can(n[0])).slice(0,4).map(n=>`<button data-a="go" data-v="${n[0]}" class="${S.view===n[0]?'on':''}"><i>${ICO[n[0]]}</i>${n[1].split(' ')[0]}</button>`).join('')}<button data-a="menu"><i>☰</i>Altro</button></nav>`;
+ lastView=S.view+S.sel;
+ save();
+}
+const go=(v,sel=null,tab='dati')=>{S.view=v;S.sel=sel;S.tab=tab;render();window.scrollTo(0,0)};
+const modal=(title,body,foot='',wide=false)=>{$('#modal').innerHTML=`<div class="ov" data-a="ovclose"><div class="md ${wide?'wide':''}" role="dialog" aria-label="${esc(title)}"><div class="mdh"><h2 style="margin:0">${title}</h2><button class="x" data-a="close" aria-label="Chiudi">×</button></div><div class="mdb">${body}</div>${foot?`<div class="mdf">${foot}</div>`:''}</div></div>`};
+const closeM=()=>$('#modal').innerHTML='';
+
+/* ---------- viste ---------- */
+const V={};
+V.dash=()=>{
+ const r=R(),pv=S.preventivi,ord=S.ordini.filter(o=>o.id!=='OC-399');
+ const appr=pv.filter(p=>p.stato==='In approvazione'),bloc=S.avvisi.filter(a=>a.blocco&&!a.chiuso),mine=S.avvisi.filter(a=>a.to===S.me&&!a.letto);
+ const tot=pv.filter(p=>p.stato==='Accettato').reduce((a,p)=>a+totals(p).one,0);
+ const scad=S.stampanti.filter(p=>p.scad&&(new Date(p.scad)-clock)/864e5<75);
+ const att=[];
+ if(appr.length&&r==='admin')att.push(['amb',`${appr.length} preventivo da approvare`,'preventivi']);
+ S.trattative.filter(t=>t.ferma).forEach(t=>att.push(['amb',`Trattativa ferma da oltre 7 giorni: ${CL(t.cli).nome}`,'trattative']));
+ S.clienti.filter(c=>c.tipo==='Azienda'&&!c.sdi&&!c.pec).forEach(c=>att.push(['red',`${c.nome}: manca codice SDI o PEC`,'clienti',c.id]));
+ bloc.forEach(b=>att.push(['red',b.t,'assemblaggio']));
+ scad.forEach(p=>att.push(['amb',`Contratto ${p.prop.toLowerCase()} in scadenza: ${p.n} (${p.gest}, ${day(p.scad)})`,'impostazioni']));
+ S.docs.filter(d=>['Da inviare','Dati incompleti','Da correggere'].includes(d.stato)).length&&att.push(['blu',`${S.docs.filter(d=>['Da inviare','Dati incompleti','Da correggere'].includes(d.stato)).length} documenti da inviare al commercialista`,'commercialista']);
+ const fasiV=FASI.map(f=>[f[1],S.trattative.filter(t=>t.fase===f[0]).reduce((a,t)=>a+t.val,0),S.trattative.filter(t=>t.fase===f[0]).length]),mx=Math.max(1,...fasiV.map(x=>x[1]));
+ const sediV=SEDI.map(s=>[s,Object.keys(S.stock).reduce((a,c)=>a+Math.max(0,libero(c,s)),0),Object.keys(S.stock).reduce((a,c)=>a+riservato(c,s),0)]),mx2=Math.max(1,...sediV.map(x=>x[1]+x[2]));
+ return `<div class="hero"><div style="flex:1;min-width:220px"><h1>Buongiorno, ${esc(ME().n)}</h1><p>${ROLES[r]} · ${day(clock)} · ${att.length?att.length+' cose richiedono attenzione':'tutto in ordine'}</p></div><button class="btn" data-a="tour">▶ Avvia la demo guidata</button><button class="btn" data-a="reset" id="btn-reset">Ripristina demo</button></div>
+ <div class="grid g4" style="margin-bottom:14px">
+ <div class="card"><div class="lab">Richieste aperte</div><div class="kpi">${S.richieste.filter(x=>!['Convertita','Chiusa'].includes(x.stato)).length}</div></div>
+ <div class="card"><div class="lab">Preventivi in corso</div><div class="kpi">${pv.filter(p=>!['Accettato','Rifiutato'].includes(p.stato)).length}</div><div class="small mut">${appr.length} in approvazione</div></div>
+ <div class="card"><div class="lab">Ordini dei clienti aperti</div><div class="kpi">${ord.filter(o=>!['Spedito','Consegnato'].includes(o.stato)).length}</div><div class="small mut">${ord.filter(o=>!pronto(o)&&o.as?.stato==='In attesa pezzi').length} in attesa di pezzi</div></div>
+ <div class="card"><div class="lab">Venduto (una tantum)</div><div class="kpi">${eur(tot)}</div><div class="small mut">${pv.filter(p=>p.stato==='Accettato').length} preventivi accettati</div></div></div>
+ <div class="grid g2" style="margin-bottom:14px"><div class="card"><h2>Trattative per fase</h2>${fasiV.map(x=>`<div class="hbar"><span>${x[0]} <span class="mut">(${x[2]})</span></span><div class="bar"><b style="width:${x[1]/mx*100}%"></b></div><span class="n">${eur(x[1]).replace(',00','')}</span></div>`).join('')}</div>
+ <div class="card"><h2>Pezzi nei magazzini</h2>${sediV.map(x=>`<div class="hbar"><span>${x[0]}</span><div class="bar" style="display:flex"><b style="width:${x[1]/mx2*100}%"></b><b style="width:${x[2]/mx2*100}%;background:#e8a33d"></b></div><span class="n">${x[1]} · <span style="color:#c27c0e">${x[2]}</span></span></div>`).join('')}<div class="small mut" style="margin-top:6px"><b style="color:var(--acc)">■</b> liberi &nbsp; <b style="color:#e8a33d">■</b> riservati agli ordini</div></div></div>
+ <div class="grid side2"><div class="card"><h2>Richiede attenzione</h2>${att.length?att.map(a=>`<div class="alert a-${a[0]}" style="margin-bottom:8px"><span style="flex:1">${esc(a[1])}</span><button class="btn sm" data-a="go" data-v="${a[2]}" ${a[3]?`data-s="${a[3]}"`:''}>Apri</button></div>`).join(''):'<div class="empty">Niente in sospeso.</div>'}</div>
+ <div class="card"><h2>I tuoi avvisi</h2>${mine.length?mine.slice(0,6).map(a=>`<div class="chk"><span class="tag t-blu">Nuovo</span><span>${esc(a.t)}</span></div>`).join(''):'<div class="mut small">Nessun avviso nuovo.</div>'}
+ <h2 style="margin-top:14px">Oggi in calendario</h2>${S.appunt.filter(a=>day(a.q)===day(clock)).map(a=>`<div class="chk small"><b>${pad(new Date(a.q).getHours(),2)}:${pad(new Date(a.q).getMinutes(),2)}</b> ${esc(a.titolo)} <span class="mut">· ${U(a.chi).n}</span></div>`).join('')||'<div class="small mut">Niente oggi.</div>'}
+ <h2 style="margin-top:14px">Percorso della demo</h2><div class="tl small">
+ <div>Preventivo da modello per Rossi Impianti<small>Commerciale</small></div><div>Approvazione dello sconto<small>Amministratore</small></div><div>Il cliente accetta online<small>Pagina cliente</small></div><div>Pezzi riservati, trasferiti e ordinati<small>Logistica</small></div><div>Assemblaggio e seriali<small>Tecnico</small></div><div>Invio al commercialista<small>Amministrazione</small></div></div></div></div>`;
+};
+
+V.clienti=()=>{
+ if(S.sel)return cliente(CL(S.sel));
+ return `<div class="crumb">Clienti</div><div class="hrow"><h1>Clienti</h1>${tag(S.clienti.length+' schede','gry')}<div class="sp"></div><button class="btn pri" data-a="nuovoCli">+ Nuovo cliente</button></div>
+ <div class="card p0"><table class="stack"><thead><tr><th>Cliente</th><th>Tipo</th><th>Telefono</th><th>Listino</th><th>Responsabile</th><th>Dati fiscali</th></tr></thead><tbody>
+ ${S.clienti.map(c=>`<tr class="click" data-a="go" data-v="clienti" data-s="${c.id}"><td><b>${esc(c.nome)}</b><div class="small mut">${esc(c.email)}</div></td><td>${tag(c.tipo,c.tipo==='Azienda'?'vio':'blu')}</td><td>${esc(c.tel)}</td><td>${c.listino}</td><td>${av(c.resp)}${U(c.resp).n}</td><td>${c.sdi||c.pec?tag('Completi','grn'):tag('Manca SDI/PEC','red')}</td></tr>`).join('')}</tbody></table></div>`;
+};
+function compl(c){const f=[c.nome,c.tel,c.email,c.ind,c.tipo==='Azienda'?c.piva:'ok',c.sdi||c.pec];return Math.round(f.filter(Boolean).length/f.length*100)}
+function cliente(c){
+ const pv=S.preventivi.filter(p=>p.cli===c.id),od=S.ordini.filter(o=>o.cli===c.id),cp=compl(c);
+ const tabs=[['dati','Dati generali'],['fisc','Fatturazione'],['ref','Referenti'],['storia','Storico'],['doc','Preventivi e ordini']];
+ const st=(c.tratt=S.trattative.find(t=>t.cli===c.id));
+ let body='';
+ if(S.tab==='dati')body=`<div class="grid g3">${fld('Ragione sociale o nome',c.nome,'nome')}${fld('Partita IVA',c.piva,'piva')}${fld('Telefono',c.tel,'tel')}${fld('Email',c.email,'email')}${fld('Indirizzo',c.ind,'ind')}
+  <div class="f"><label>Listino</label><select class="in" data-ch="cli.listino">${LISTINI.map(l=>`<option ${l===c.listino?'selected':''}>${l}</option>`).join('')}</select></div>
+  <div class="f"><label>Responsabile della pratica</label><select class="in" data-ch="cli.resp">${USERS.filter(u=>!['est','tec','log'].includes(u.r)).map(u=>`<option value="${u.id}" ${u.id===c.resp?'selected':''}>${u.n} · ${ROLES[u.r]}</option>`).join('')}</select></div>${fld('Canale',c.canale,'canale')}</div>`;
+ if(S.tab==='fisc')body=`${!c.sdi&&!c.pec?'<div class="alert a-red">Per inviare i documenti al commercialista serve almeno il codice SDI o la PEC.</div>':''}<div class="grid g3">${fld('Codice destinatario SDI',c.sdi,'sdi','es. M5UXCR1')}${fld('PEC',c.pec,'pec','es. amministrazione@pec.it')}${fld('Partita IVA',c.piva,'piva')}</div>`;
+ if(S.tab==='ref')body=`<div class="row" style="margin-bottom:10px"><span class="sp"></span><button class="btn sm pri" data-a="nuovoRef" id="btn-nuovo-ref">+ Aggiungi referente</button></div>`+(c.ref.length?`<table><thead><tr><th>Nome</th><th>Ruolo</th><th>Telefono</th><th>Email</th></tr></thead><tbody>${c.ref.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">Nessun referente: per i privati non serve.</div>');
+ if(S.tab==='storia')body=`<div class="row" style="margin-bottom:10px"><input class="in" id="nota-txt" placeholder="Scrivi una nota, una chiamata, un accordo…"><button class="btn pri" data-a="addNota" id="btn-nota">Aggiungi</button></div><div class="tl">${[...c.st].reverse().map(s=>`<div>${esc(s[1])}<small>${fmt(s[0])} · ${esc(s[2])}</small></div>`).join('')||'<div>Nessuna attività</div>'}</div>`;
+ if(S.tab==='doc')body=`<table><thead><tr><th>Documento</th><th>Stato</th><th class="n">Importo</th></tr></thead><tbody>${pv.map(p=>`<tr class="click" data-a="go" data-v="preventivi" data-s="${p.id}"><td>Preventivo ${p.id} · v${p.ver}</td><td>${tag(p.stato,stTag(p.stato))}</td><td class="n">${eur(totals(p).one)}</td></tr>`).join('')}${od.map(o=>`<tr class="click" data-a="go" data-v="ordini" data-s="${o.id}"><td>Ordine del cliente ${o.id}</td><td>${tag(o.stato,stTag(o.stato))}</td><td class="n">—</td></tr>`).join('')}</tbody></table>${!pv.length&&!od.length?'<div class="empty">Ancora nessun documento.</div>':''}`;
+ return `<div class="crumb">Clienti › ${esc(c.nome)}</div><div class="hrow"><button class="btn sm" data-a="go" data-v="clienti">←</button><h1>${esc(c.nome)}</h1>${tag(c.tipo,'vio')}${st?tag('Trattativa: '+FASI.find(f=>f[0]===st.fase)[1],'amb'):''}<div class="sp"></div>
+ <button class="btn" data-a="nuovaRich" data-c="${c.id}">+ Richiesta</button><button class="btn" data-a="nuovaTratt" data-c="${c.id}">+ Trattativa</button><button class="btn" data-a="nuovoApp" data-c="${c.id}">+ Appuntamento</button>${['admin','comm','acc','amm'].includes(R())?`<button class="btn pri" data-a="nuovoPv" data-c="${c.id}" id="btn-pv-${c.id}">+ Preventivo</button>`:''}</div>
+ <div class="grid side2"><div class="card"><div class="tabs">${tabs.map(t=>`<button data-a="tab" data-t="${t[0]}" class="${S.tab===t[0]?'on':''}" id="tab-${t[0]}">${t[1]}</button>`).join('')}</div>${body}</div>
+ <div class="grid" style="align-content:start"><div class="card"><h2>Completezza anagrafica</h2><div class="bar"><b style="width:${cp}%"></b></div><div class="small mut" style="margin-top:6px">${cp}%${!c.sdi&&!c.pec?' · manca SDI o PEC (serve per il commercialista)':''}</div></div>
+ <div class="card"><h2>Riepilogo</h2><div class="grid g2"><div><div class="lab">Preventivi</div><div class="kpi">${pv.length}</div></div><div><div class="lab">Ordini</div><div class="kpi">${od.length}</div></div></div></div></div></div>`;
+}
+const fld=(l,v,k,ph='')=>`<div class="f"><label>${l}</label><input class="in" value="${esc(v)}" placeholder="${esc(ph)}" data-ch="cli.${k}" id="f-${k}"></div>`;
+
+V.richieste=()=>{const f=S.fR||'Aperte';const L=S.richieste.filter(r=>f==='Tutte'||(f==='Aperte'?!['Convertita','Chiusa'].includes(r.stato):r.stato===f));
+ return `<div class="crumb">Richieste</div><div class="hrow"><h1>Richieste</h1>${tag(S.richieste.filter(r=>!['Convertita','Chiusa'].includes(r.stato)).length+' aperte','amb')}<div class="sp"></div><button class="btn pri" data-a="nuovaRich" id="btn-nuova-rich">+ Nuova richiesta</button></div>
+ <div class="tabs">${['Aperte','Convertita','Chiusa','Tutte'].map(x=>`<button data-a="fR" data-f="${x}" class="${f===x?'on':''}">${x==='Convertita'?'Convertite':x==='Chiusa'?'Chiuse':x}</button>`).join('')}</div>
+ ${L.length?`<div class="card p0"><table class="stack"><thead><tr><th>Richiesta</th><th>Cliente</th><th>Canale</th><th>Priorità</th><th>Assegnata a</th><th>Stato</th><th></th></tr></thead><tbody>
+ ${L.map(r=>`<tr><td><b>${r.id}</b><div class="small mut">${esc(r.titolo)}</div>${r.descr?`<div class="small mut" style="max-width:340px">${esc(r.descr)}</div>`:''}</td><td><a href="#" data-a="go" data-v="clienti" data-s="${r.cli}">${esc(CL(r.cli).nome)}</a></td><td>${r.canale}</td><td>${r.prio==='Urgente'?tag('Urgente','red'):tag('Normale','gry')}</td><td>${av(r.resp)}${U(r.resp).n}</td><td>${tag(r.stato,r.stato==='Convertita'?'grn':r.stato==='Chiusa'?'gry':'amb')}</td>
+ <td class="n">${!['Convertita','Chiusa'].includes(r.stato)?`<div class="row" style="justify-content:flex-end"><button class="btn sm pri" data-a="converti" data-r="${r.id}" id="conv-${r.id}">→ Trattativa</button><button class="btn sm" data-a="nuovoPv" data-c="${r.cli}">€ Preventivo</button><button class="btn sm" data-a="chiudiRich" data-r="${r.id}">Chiudi</button></div>`:''}</td></tr>`).join('')}</tbody></table></div>`:'<div class="card empty">Nessuna richiesta in questo filtro.</div>'}`};
+
+const FASI=[['contatto','Primo contatto'],['valutazione','Valutazione'],['preventivo','Preventivo'],['attesa','Attesa risposta'],['vinta','Vinta'],['persa','Persa']];
+V.trattative=()=>{const tot=S.trattative.filter(t=>!['vinta','persa'].includes(t.fase)).reduce((a,t)=>a+t.val,0);
+ return `<div class="crumb">Trattative</div><div class="hrow"><h1>Trattative</h1>${tag('In corso: '+eur(tot),'blu')}<span class="small mut">Trascina una scheda o cambia fase dal menu. Clic per aprirla.</span><div class="sp"></div><button class="btn pri" data-a="nuovaTratt" id="btn-nuova-tratt">+ Nuova trattativa</button></div>
+ <div class="kan">${FASI.map(f=>`<div class="col" data-drop="${f[0]}"><div class="row" style="margin-bottom:8px"><b>${f[1]}</b><span class="mut small">${S.trattative.filter(t=>t.fase===f[0]).length}</span><span class="sp"></span><span class="small mut">${eur(S.trattative.filter(t=>t.fase===f[0]).reduce((a,t)=>a+t.val,0)).replace(',00','')}</span></div>
+ ${S.trattative.filter(t=>t.fase===f[0]).map(t=>`<div class="kc" draggable="true" data-drag="${t.id}" data-a="apriTratt" data-t="${t.id}" id="kc-${t.id}"><b>${esc(CL(t.cli).nome)}</b><div class="small mut">${esc(t.titolo)}</div><div class="row" style="margin-top:6px"><b class="small">${eur(t.val)}</b><span class="tag t-gry">${t.prob??50}%</span><span class="sp"></span>${av(t.resp)}</div>${t.next?`<div class="small" style="margin-top:6px">⏭ ${esc(t.next)}${t.quando?` · <span class="mut">${day(t.quando)}</span>`:''}</div>`:''}<select class="in" style="height:30px;margin-top:6px;font-size:12px" data-ch="fase" data-t="${t.id}" aria-label="Fase">${FASI.map(f=>`<option value="${f[0]}" ${f[0]===t.fase?'selected':''}>${f[1]}</option>`).join('')}</select>${t.ferma?'<div style="margin-top:6px">'+tag('Ferma da 7+ giorni','amb')+'</div>':''}</div>`).join('')}</div>`).join('')}</div>`};
+
+/* ----- calendario ----- */
+V.calendario=()=>{const days=[...Array(7)].map((_,k)=>{const d=new Date(2026,10,20+k);return d});
+ const it=d=>S.appunt.filter(a=>day(a.q)===day(d)).sort((a,b)=>new Date(a.q)-new Date(b.q));
+ const GG=['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+ return `<div class="crumb">Calendario</div><div class="hrow"><h1>Calendario</h1><span class="small mut">Appuntamenti, consegne, installazioni e richiami</span><div class="sp"></div><button class="btn pri" data-a="nuovoApp" id="btn-nuovo-app">+ Nuovo appuntamento</button></div>
+ <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">${days.map(d=>`<div class="card" style="min-height:150px;${day(d)===day(clock)?'border-color:var(--acc);box-shadow:inset 0 3px var(--acc)':''}"><div class="row" style="margin-bottom:8px"><b>${GG[d.getDay()]} ${d.getDate()}</b>${day(d)===day(clock)?tag('Oggi','blu'):''}</div>
+ ${it(d).map(a=>`<div style="border-left:3px solid ${({Appuntamento:'#3b82c4',Installazione:'#2e9d5b',Consegna:'#e8a33d',Richiamo:'#7a4cc2'})[a.tipo]||'#888'};padding:4px 8px;margin-bottom:6px;background:var(--soft);border-radius:0 6px 6px 0"><div class="small"><b>${pad(new Date(a.q).getHours(),2)}:${pad(new Date(a.q).getMinutes(),2)}</b> ${esc(a.titolo)}</div><div class="small mut">${a.cli?esc(CL(a.cli).nome)+' · ':''}${U(a.chi).n}</div></div>`).join('')||'<div class="small mut">Libero</div>'}</div>`).join('')}</div>`};
+
+V.catalogo=()=>{
+ if(S.sel){const i=IT(S.sel);return `<div class="crumb">Catalogo › ${i.c}</div><div class="hrow"><button class="btn sm" data-a="go" data-v="catalogo">←</button><h1>${esc(i.n)}</h1>${tag(i.t,'vio')}</div>
+ <div class="grid side2"><div class="card"><h2>Prezzi per listino</h2><table><thead><tr><th>Listino</th><th class="n">Prezzo</th><th class="n">Margine</th></tr></thead><tbody>${LISTINI.map((l,k)=>`<tr><td>${l}</td><td class="n">${eur(i.p[k])}${recurring(i.c)?' / mese':''}</td><td class="n">${unitCost(i.c)?((i.p[k]-unitCost(i.c))/i.p[k]*100).toFixed(1)+'%':'—'}</td></tr>`).join('')}</tbody></table>
+ ${i.bom?`<h2 style="margin-top:16px">Componenti (articoli di magazzino)</h2><table><thead><tr><th>Componente</th><th class="n">Q.tà</th>${SEDI.map(s=>`<th class="n">${s}</th>`).join('')}</tr></thead><tbody>${i.bom.map(([c,q])=>`<tr><td>${esc(IT(c).n)}<div class="small mut">${c}</div></td><td class="n">${q}</td>${SEDI.map(s=>`<td class="n">${libero(c,s)}</td>`).join('')}</tr>`).join('')}</tbody></table><div class="small mut" style="margin-top:6px">Pezzi liberi per sede, aggiornati a ogni movimento.</div>`:''}</div>
+ <div class="card"><h2>Dati</h2><div class="small"><b>Codice</b> ${i.c}<br><b>Costo</b> ${eur(unitCost(i.c))}<br><b>Sconto massimo senza approvazione</b> ${i.sc}%${i.durata?`<br><b>Durata</b> ${i.durata} mesi`:''}</div></div></div>`}
+ return `<div class="crumb">Catalogo</div><div class="hrow"><h1>Catalogo</h1>${tag(Object.keys(S.catalog).length+' voci','gry')}<div class="sp"></div>${['admin','log'].includes(R())?'<button class="btn pri" data-a="nuovoArt" id="btn-nuovo-art">+ Nuovo articolo</button>':''}</div><div class="card p0"><table class="stack"><thead><tr><th>Voce</th><th>Tipo</th><th class="n">Aziende B</th><th class="n">Liberi (tutte le sedi)</th></tr></thead><tbody>
+ ${Object.values(S.catalog).map(i=>`<tr class="click" data-a="go" data-v="catalogo" data-s="${i.c}"><td><b>${esc(i.n)}</b><div class="small mut">${i.c}</div></td><td>${tag({config:'Configurazione',componente:'Componente',finito:'Prodotto',servizio:'Servizio',canone:'Canone',noleggio:'Noleggio'}[i.t],recurring(i.c)?'vio':'gry')}</td><td class="n">${eur(i.p[2])}${recurring(i.c)?'/mese':''}</td><td class="n">${['componente','finito'].includes(i.t)?SEDI.reduce((a,s)=>a+libero(i.c,s),0):'—'}</td></tr>`).join('')}</tbody></table></div>`;
+};
+
+/* ----- preventivi ----- */
+V.preventivi=()=>{
+ if(S.sel)return preventivo(S.preventivi.find(p=>p.id===S.sel));
+ const list=R()==='admin'?S.preventivi:S.preventivi;
+ return `<div class="crumb">Preventivi</div><div class="hrow"><h1>Preventivi</h1><span class="sp"></span>${['admin','comm','acc'].includes(R())?'<button class="btn pri" data-a="nuovoPv" id="btn-nuovo-pv">+ Nuovo preventivo</button>':''}</div>
+ ${list.length?`<div class="card p0"><table class="stack"><thead><tr><th>Preventivo</th><th>Cliente</th><th>Responsabile</th><th>Stato</th><th class="n">Una tantum</th><th class="n">Mensile</th></tr></thead><tbody>${list.map(p=>{const t=totals(p);return `<tr class="click" data-a="go" data-v="preventivi" data-s="${p.id}" id="row-${p.id}"><td><b>${p.id}</b> · v${p.ver}</td><td>${esc(CL(p.cli).nome)}</td><td>${av(p.resp)}${U(p.resp).n}</td><td>${tag(p.stato,stTag(p.stato))}</td><td class="n">${eur(t.one)}</td><td class="n">${t.mon?eur(t.mon):'—'}</td></tr>`}).join('')}</tbody></table></div>`:'<div class="card empty">Nessun preventivo. Apri un cliente e premi «+ Preventivo», oppure usa ⌘K.</div>'}`;
+};
+function preventivo(p){
+ const t=totals(p),c=CL(p.cli),edit=['Bozza','Rifiutato'].includes(p.stato)&&(p.resp===S.me||R()==='admin'),mot=motivi(p,U(p.resp).r);
+ const row=(r,k)=>{const i=IT(r.code),pu=price(r.code,p.listino);return `<tr><td><div class="row"><div class="ph" style="width:46px;height:38px">${i.img==='pc'?PC_SVG:i.img==='mon'?MON_SVG:i.img==='prn'?PRN_SVG:''}</div><div><b>${esc(i.n)}</b><div class="small mut">${i.c}</div></div></div>${i.bom?`<div class="small mut" style="margin:6px 0 0 56px">${i.bom.map(([cc,q])=>`${q>1?q+'× ':''}${esc(IT(cc).n)}`).join(' · ')}</div>`:''}</td>
+ <td class="n">${edit?`<input class="in" style="width:70px;text-align:right" type="number" min="1" value="${r.qty}" data-ch="riga.qty" data-k="${k}" id="q-${k}">`:r.qty}</td><td class="n">${eur(pu)}</td>
+ <td class="n">${edit&&!recurring(r.code)?`<input class="in" style="width:70px;text-align:right" type="number" min="0" max="50" value="${r.sc}" data-ch="riga.sc" data-k="${k}" id="sc-${k}">`:r.sc+'%'}</td>
+ <td class="n"><b>${eur(pu*r.qty*(1-r.sc/100))}</b></td><td>${tag(recurring(r.code)?'Mensile':'Una tantum',recurring(r.code)?'vio':'gry')}</td><td>${edit?`<button class="btn sm" data-a="delRiga" data-k="${k}" aria-label="Rimuovi">×</button>`:''}</td></tr>`};
+ const azioni=[];
+ if(edit)azioni.push(`<button class="btn pri" data-a="pvInvia" id="btn-conferma">Conferma preventivo</button>`);
+ if(p.stato==='In approvazione'&&R()==='admin')azioni.push(`<button class="btn ok" data-a="appr" id="btn-approva">✓ Approva</button><button class="btn" data-a="rifiuta" id="btn-rifiuta">Rifiuta</button>`);
+ if(p.stato==='Approvato'&&(p.resp===S.me||R()==='admin'))azioni.push(`<button class="btn pri" data-a="pvMail" id="btn-email">Invia al cliente via email</button>`);
+ if(['Approvato','Inviato','Accettato'].includes(p.stato))azioni.push(`<button class="btn" data-a="portale" id="btn-portale">Vedi come il cliente</button><button class="btn" data-a="stampa" id="btn-stampa">Stampa</button>`);
+ return `<div class="crumb">Preventivi › ${p.id}</div><div class="hrow"><button class="btn sm" data-a="go" data-v="preventivi">←</button><h1>${p.id} · ${esc(c.nome)}</h1>${tag(p.stato,stTag(p.stato))}${tag('Versione '+p.ver,'gry')}<div class="sp"></div>${azioni.join('')}</div>
+ ${p.stato==='In approvazione'?`<div class="alert a-amb"><b>In attesa dell'amministratore.</b> ${mot.map(esc).join(' · ')}</div>`:''}
+ ${edit&&mot.length?`<div class="alert a-amb">Alla conferma andrà all'amministratore: ${mot.map(esc).join(' · ')}</div>`:''}
+ ${edit&&!mot.length&&p.righe.length?`<div class="alert a-grn">Entro le regole del tuo ruolo: alla conferma è subito pronto da inviare, senza attese.</div>`:''}
+ ${p.stato==='Accettato'?`<div class="alert a-grn">Accettato online da <b>${esc(p.acc.nome)}</b> il ${fmt(p.acc.q)} (versione ${p.ver}). Creato l'ordine del cliente <b>${p.ord}</b>.<button class="btn sm" data-a="go" data-v="ordini" data-s="${p.ord}">Apri ordine</button></div>`:''}
+ <div class="grid g4" style="margin-bottom:12px"><div class="f"><label>Cliente</label><div class="in" style="display:flex;align-items:center">${esc(c.nome)}</div></div><div class="f"><label>Responsabile della pratica</label><div class="in" style="display:flex;align-items:center">${U(p.resp).n} · ${ROLES[U(p.resp).r]}</div></div>
+ <div class="f"><label>Listino</label><div class="in" style="display:flex;align-items:center">${p.listino}</div></div><div class="f"><label>Validità</label><div class="in" style="display:flex;align-items:center">30 giorni</div></div></div>
+ <div class="card p0" style="margin-bottom:12px"><table><thead><tr><th>Prodotto o servizio</th><th class="n">Q.tà</th><th class="n">Prezzo</th><th class="n">Sconto %</th><th class="n">Totale</th><th>Pagamento</th><th></th></tr></thead><tbody>${p.righe.map(row).join('')}</tbody></table>
+ ${edit?`<div style="padding:10px 12px" class="row"><select class="in" style="max-width:420px" id="add-code">${Object.values(S.catalog).filter(i=>i.t!=='componente').map(i=>`<option value="${i.c}">${esc(i.n)}</option>`).join('')}</select><button class="btn" data-a="addRiga" id="btn-add">+ Aggiungi dal catalogo</button></div>`:''}</div>
+ <div class="grid side2"><div class="card"><h2>Storico</h2><div class="tl small">${[...p.st].reverse().map(s=>`<div>${esc(s[1])}<small>${fmt(s[0])} · ${esc(s[2])}</small></div>`).join('')}</div></div>
+ <div class="card"><table><tbody><tr><td>Totale una tantum</td><td class="n">${eur(t.one)}</td></tr><tr><td>IVA 22%</td><td class="n">${eur(t.iva)}</td></tr><tr><td><b>Totale all'ordine</b></td><td class="n"><b>${eur(t.tot)}</b></td></tr><tr><td>Canoni e noleggi</td><td class="n">${eur(t.mon)} / mese</td></tr>${R()==='admin'||R()==='comm'?`<tr><td class="mut">Margine</td><td class="n ${t.marg<S.regole.margine?'ko-i':'ok-i'}">${t.marg.toFixed(1)}%</td></tr>`:''}</tbody></table></div></div>`;
+}
+function portaleHTML(p,interactive=true){
+ const t=totals(p),c=CL(p.cli),one=p.righe.filter(r=>!recurring(r.code)),mon=p.righe.filter(r=>recurring(r.code));
+ return `<div class="portal"><div class="pbar">🔒 preventivi.nbcomputers.it/${p.id}</div><div style="padding:18px" class="grid side2">
+ <div><div class="row" style="margin-bottom:10px"><div style="width:40px;height:40px;border-radius:10px;background:#1e3a5f;color:#fff;display:grid;place-items:center;font-weight:800">NB</div><div><b>NB Computers S.r.l.</b><div class="small mut">Preventivo ${p.id} · versione ${p.ver} · valido 30 giorni</div></div></div>
+ <h1 style="font-size:19px;margin-bottom:10px">Gentile ${esc(c.ref[0]?.[0]||c.nome)}, ecco la nostra proposta</h1>
+ ${one.filter(r=>IT(r.code).img).map(r=>{const i=IT(r.code);return `<div class="card row" style="margin-bottom:8px"><div class="ph">${i.img==='pc'?PC_SVG:MON_SVG}</div><div><b>${r.qty} × ${esc(i.n)}</b>${i.bom?`<div class="small mut">${i.bom.map(([cc,q])=>`${q>1?q+'× ':''}${esc(IT(cc).n)}`).join(' · ')}</div>`:''}</div></div>`}).join('')}
+ <table style="margin-top:6px"><thead><tr><th>Si paga una volta</th><th class="n">Importo</th></tr></thead><tbody>${one.map(r=>`<tr><td>${r.qty} × ${esc(IT(r.code).n)}${r.sc?` (sconto ${r.sc}%)`:''}</td><td class="n">${eur(price(r.code,p.listino)*r.qty*(1-r.sc/100))}</td></tr>`).join('')}</tbody></table>
+ ${mon.length?`<table style="margin-top:10px"><thead><tr><th>Si paga ogni mese</th><th class="n">Canone</th></tr></thead><tbody>${mon.map(r=>`<tr><td>${r.qty} × ${esc(IT(r.code).n)}</td><td class="n">${eur(price(r.code,p.listino)*r.qty)}</td></tr>`).join('')}</tbody></table>`:''}</div>
+ <div><div class="card"><div class="lab">Totale da pagare all'ordine</div><div class="kpi">${eur(t.tot)}</div><div class="small mut">${eur(t.one)} + IVA 22%</div>${t.mon?`<div class="lab" style="margin-top:10px">Poi ogni mese</div><div class="kpi" style="font-size:22px">${eur(t.mon)} <span class="small mut">+ IVA</span></div>`:''}</div>
+ ${interactive&&p.stato==='Inviato'?`<div class="card" style="margin-top:10px"><div class="f"><label>Nome e cognome di chi accetta</label><input class="in" id="acc-nome" value="${esc(c.ref[0]?.[0]||'')}"></div><div class="chk small"><input type="checkbox" id="acc-ok" checked><label for="acc-ok">Accetto il preventivo e le condizioni allegate</label></div><button class="btn ok" style="width:100%;justify-content:center;height:42px;margin-top:6px" data-a="accetta" id="btn-accetta">✓ Accetta e firma online</button><button class="btn" style="width:100%;justify-content:center;margin-top:8px" data-a="modifica">Chiedi una modifica</button></div>`:''}
+ ${p.stato==='Accettato'?`<div class="alert a-grn" style="margin-top:10px">Accettato da ${esc(p.acc.nome)} il ${fmt(p.acc.q)}</div>`:''}
+ ${p.stato==='Approvato'?`<div class="alert a-blu" style="margin-top:10px">Anteprima: il cliente vedrà i pulsanti per accettare dopo l'invio.</div>`:''}
+ <div class="card small" style="margin-top:10px"><b>Il suo referente</b><br>${U(p.resp).n}<br><span class="mut">Consegna entro 10 giorni lavorativi · bonifico 30 gg d.f.f.m.</span></div></div></div></div>`;
+}
+
+/* ----- ordini ----- */
+V.ordini=()=>{
+ if(S.sel)return ordine(S.ordini.find(o=>o.id===S.sel));
+ const L=S.ordini.filter(o=>o.id!=='OC-399');
+ return `<div class="crumb">Ordini clienti</div><div class="hrow"><h1>Ordini dei clienti</h1><span class="small mut">Nascono dal preventivo accettato. Sono diversi dagli ordini ai fornitori.</span></div>
+ ${L.length?`<div class="card p0"><table class="stack"><thead><tr><th>Ordine del cliente</th><th>Cliente</th><th>Preventivo</th><th>Stato</th><th>Pezzi</th></tr></thead><tbody>${L.map(o=>{const f=fabbisogno(o),m=f.reduce((a,x)=>a+x.manca,0);return `<tr class="click" data-a="go" data-v="ordini" data-s="${o.id}" id="row-${o.id}"><td><b>${o.id}</b></td><td>${esc(CL(o.cli).nome)}</td><td>${o.pv}</td><td>${tag(o.stato,stTag(o.stato))}</td><td>${pronto(o)?tag('Tutti riservati','grn'):m?tag(m+' da coprire','red'):tag('In arrivo','amb')}</td></tr>`}).join('')}</tbody></table></div>`:'<div class="card empty">Ancora nessun ordine: nasce quando il cliente accetta un preventivo.</div>'}`;
+};
+const OSTEP=['Confermato','In approvvigionamento','In assemblaggio','Pronto','Spedito','Consegnato'];
+function ordine(o){
+ const f=fabbisogno(o),p=S.preventivi.find(x=>x.id===o.pv),man=f.some(x=>x.manca)&&o.as?.stato!=='Completato',can2=['admin','log'].includes(R());
+ const canoni=p.righe.filter(r=>recurring(r.code));
+ return `<div class="crumb">Ordini clienti › ${o.id}</div><div class="hrow"><button class="btn sm" data-a="go" data-v="ordini">←</button><h1>Ordine del cliente ${o.id}</h1>${tag(o.stato,stTag(o.stato))}${tag(CL(o.cli).nome,'vio')}<div class="sp"></div>
+ ${can2&&man?`<button class="btn pri" data-a="proponi" id="btn-proponi">Trova i pezzi mancanti</button>`:''}${o.stato==='Pronto'&&can2?`<button class="btn pri" data-a="spedisci" id="btn-spedisci">Spedisci al cliente</button>`:''}${o.stato==='Spedito'&&can2?`<button class="btn ok" data-a="consegna" id="btn-consegna">✓ Segna consegnato</button>`:''}</div>
+ <div class="card" style="margin-bottom:12px;padding-bottom:4px"><div class="small mut" style="margin-bottom:4px">L'ordine è del cliente <b style="color:var(--ink)">${esc(CL(o.cli).nome)}</b> · nato dal preventivo ${o.pv} accettato da ${esc(p.acc?.nome||'')}</div><div class="stp">${OSTEP.map((x,k)=>{const i=OSTEP.indexOf(o.stato);return `<div data-n="${k+1}" class="${k<i||o.stato==='Consegnato'?'done':k===i?'cur':''}">${x}</div>`}).join('')}</div></div>
+ <div class="card p0" style="margin-bottom:12px"><div style="padding:12px 14px 0"><h2>Fabbisogno di pezzi · sede di lavoro: Centrale</h2></div><table><thead><tr><th>Articolo</th><th class="n">Serve</th><th class="n">Riservati</th><th class="n">In transito</th><th class="n">Ordinati</th><th class="n">Da coprire</th></tr></thead><tbody>
+ ${f.map(x=>`<tr><td><b>${esc(IT(x.code).n)}</b><div class="small mut">${x.code}</div></td><td class="n">${x.q}</td><td class="n">${x.ris}</td><td class="n">${x.tr||'—'}</td><td class="n">${x.ord||'—'}</td><td class="n ${x.manca?'ko-i':'ok-i'}">${x.manca||'✓'}</td></tr>`).join('')}</tbody></table></div>
+ <div class="grid side2"><div class="card"><h2>Collegati</h2><table><tbody>
+ <tr><td>Preventivo accettato</td><td><button class="btn sm" data-a="go" data-v="preventivi" data-s="${o.pv}">${o.pv}</button></td></tr>
+ ${S.trasf.filter(t=>t.comm===o.id).map(t=>`<tr><td>Trasferimento ${t.id} · ${t.da} → ${t.a}</td><td>${tag(t.stato,stTag(t.stato))} <span class="small mut">${t.ddt}</span></td></tr>`).join('')}
+ ${S.po.filter(x=>x.comm===o.id).map(x=>`<tr><td>Ordine al fornitore ${x.id} · ${x.forn}</td><td>${tag(x.stato,stTag(x.stato))}</td></tr>`).join('')}
+ <tr><td>Assemblaggio</td><td>${tag(o.as?.stato||'—',o.as?.stato==='Completato'?'grn':'amb')}</td></tr>${o.track?`<tr><td>Spedizione al cliente</td><td>${tag('Spedito','grn')} <span class="small mut">${o.track}</span></td></tr>`:''}</tbody></table></div>
+ <div class="card"><h2>Canoni e noleggi da attivare</h2>${canoni.length?canoni.map(r=>`<div class="chk"><span class="tag t-vio">${r.qty} ×</span>${esc(IT(r.code).n)}</div>`).join(''):'<div class="mut small">Nessuno</div>'}<div class="small mut" style="margin-top:6px">Passano al commercialista con il periodo di competenza.</div></div></div>`;
+}
+
+/* ----- magazzini ----- */
+V.magazzini=()=>{
+ const codes=Object.values(S.catalog).filter(i=>['componente','finito'].includes(i.t)).map(i=>i.c);
+ return `<div class="crumb">Magazzini</div><div class="hrow"><h1>Magazzini e trasferimenti</h1><span class="sp"></span>${['admin','log','acc','tec'].includes(R())?'<button class="btn pri" data-a="nuovoTr" id="btn-nuovo-tr">+ Nuovo trasferimento</button>':''}</div>
+ <div class="card p0" style="margin-bottom:14px"><table class="stack"><thead><tr><th>Articolo</th>${SEDI.map(s=>`<th class="n">${s}<div style="font-weight:400">liberi · riservati</div></th>`).join('')}</tr></thead><tbody>
+ ${codes.map(c=>`<tr><td><b>${esc(IT(c).n)}</b><div class="small mut">${c}</div></td>${SEDI.map(s=>{const l=libero(c,s),r=riservato(c,s),t=transito(c,s);return `<td class="n">${l}${r?` · <span class="ko-i">${r}</span>`:''}${t?` <span class="tag t-amb">+${t} in arrivo</span>`:''}</td>`}).join('')}</tr>`).join('')}</tbody></table></div>
+ <h2>Trasferimenti</h2>${S.trasf.length?`<div class="card p0"><table class="stack"><thead><tr><th>Trasferimento</th><th>Da → A</th><th>Pezzi</th><th>Bolla e corriere</th><th>Stato</th><th></th></tr></thead><tbody>${S.trasf.map(t=>`<tr><td><b>${t.id}</b>${t.comm?`<div class="small mut">per ${t.comm}</div>`:''}</td><td>${t.da} → ${t.a}</td><td class="small">${t.righe.map(r=>`${r.sped}× ${esc(IT(r.code).n)}${r.bloc?` <span class="ko-i">(${r.bloc} bloccati)</span>`:''}`).join('<br>')}</td><td class="small">${t.ddt}<br>${t.corr} · ${t.track}</td><td>${tag(t.stato,stTag(t.stato))}</td><td class="n">${t.stato!=='Ricevuto'&&t.righe.some(r=>r.sped)?`<button class="btn sm" data-a="avanza" data-t="${t.id}" id="av-${t.id}">${{'Bolla creata':'Segna ritirato','Ritirato':'In transito','In transito':'Ricevi in sede'}[t.stato]}</button>`:''}</td></tr>`).join('')}</tbody></table></div>`:'<div class="card empty">Nessun trasferimento.</div>'}`;
+};
+
+/* ----- fornitori e telefonate ----- */
+V.fornitori=()=>`<div class="crumb">Fornitori e telefonate</div><div class="hrow"><h1>Fornitori e telefonate</h1><span class="sp"></span><button class="btn" data-a="chiama" id="btn-chiama">Chiama dal CRM</button><button class="btn" data-a="nuovoForn" id="btn-nuovo-forn">+ Fornitore</button><button class="btn" data-a="nuovoPO" id="btn-nuovo-po">+ Ordine al fornitore</button><button class="btn pri" data-a="regTel" id="btn-regtel">Registra telefonata</button></div>
+ <div class="grid side2"><div class="card p0"><div style="padding:12px 14px 0"><h2>Ordini ai fornitori</h2></div>${S.po.length?`<table><thead><tr><th>Ordine</th><th>Fornitore</th><th>Per</th><th>Righe</th><th>Arrivo</th><th>Stato</th><th></th></tr></thead><tbody>${S.po.map(p=>`<tr><td><b>${p.id}</b></td><td>${p.forn}</td><td>${p.comm}</td><td class="small">${p.righe.map(r=>`${r.ric}/${r.qty} ${esc(IT(r.code).n)}`).join('<br>')}</td><td>${day(p.arrivo)}</td><td>${tag(p.stato,stTag(p.stato))}</td><td>${p.stato!=='Ricevuto'?`<button class="btn sm" data-a="ricevi" data-p="${p.id}" id="ric-${p.id}">Ricevi</button>`:''}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">Nessun ordine ai fornitori.</div>'}</div>
+ <div class="card"><h2>Fornitori</h2>${S.fornitori.map(f=>`<div class="chk"><b>${f.n}</b><span class="sp"></span><span class="small mut">${f.gg} giorni · prezzo ${f.k>1?'+':''}${Math.round((f.k-1)*100)}%</span></div>`).join('')}</div></div>
+ <div class="card p0" style="margin-top:14px"><div style="padding:12px 14px 0"><h2>Registro telefonate · chi ha chiamato e chi ha registrato</h2></div><table class="stack"><thead><tr><th>Quando</th><th>Fornitore</th><th>Ha telefonato</th><th>Registrato da</th><th>Per</th><th>Esito</th><th>Origine</th></tr></thead><tbody>
+ ${[...S.calls].reverse().map(c=>`<tr><td>${fmt(c.q)}</td><td>${c.forn}</td><td><b>${U(c.chi).n}</b></td><td>${U(c.reg).n}</td><td>${c.comm}</td><td>${esc(c.esito)}</td><td>${tag(c.orig,c.orig==='Centralino'?'blu':'gry')}</td></tr>`).join('')}</tbody></table></div>`;
+
+/* ----- assemblaggio ----- */
+V.assemblaggio=()=>{
+ const L=S.ordini.filter(o=>o.as&&o.id!=='OC-399');const bl=S.avvisi.filter(a=>a.blocco&&!a.chiuso);
+ return `<div class="crumb">Assemblaggio</div><div class="hrow"><h1>Assemblaggio</h1></div>
+ ${bl.map(b=>`<div class="alert a-red"><span style="flex:1"><b>Blocco momentaneo.</b> ${esc(b.t)}</span>${R()==='tec'||R()==='admin'?`<button class="btn sm" data-a="mantieni" data-id="${b.id}" id="mant-${b.id}">Mantieni la riserva</button><button class="btn sm" data-a="rilascia" data-id="${b.id}">Rilascia il pezzo</button>`:''}</div>`).join('')}
+ ${L.length?L.map(o=>{const f=fabbisogno(o),ok=f.filter(x=>x.ris>=x.q).length;return `<div class="card" style="margin-bottom:12px"><div class="hrow" style="margin-bottom:8px"><h2 style="margin:0">${o.id} · ${esc(CL(o.cli).nome)}</h2>${tag(o.as.stato,o.as.stato==='Completato'?'grn':o.as.stato==='In lavorazione'?'vio':'amb')}<span class="sp"></span>
+ ${o.as.stato==='In attesa pezzi'&&pronto(o)&&['tec','admin'].includes(R())?`<button class="btn pri" data-a="avvia" data-o="${o.id}" id="btn-avvia">Avvia assemblaggio</button>`:''}${o.as.stato==='In lavorazione'&&['tec','admin'].includes(R())?`<button class="btn ok" data-a="seriali" data-o="${o.id}" id="btn-seriali">Registra seriali e chiudi</button>`:''}</div>
+ <div class="bar" style="margin-bottom:8px"><b style="width:${f.length?ok/f.length*100:0}%"></b></div><div class="small mut" style="margin-bottom:8px">${ok} pezzi su ${f.length} pronti nella sede di lavoro</div>
+ <table><tbody>${f.map(x=>`<tr><td>${esc(IT(x.code).n)}</td><td class="n">${x.ris}/${x.q}</td><td>${x.ris>=x.q?tag('Pronto','grn'):x.tr?tag('In trasferimento','amb'):x.ord?tag('Ordinato al fornitore','blu'):tag('Mancante','red')}</td></tr>`).join('')}</tbody></table>
+ ${o.as.seriali?`<div class="small" style="margin-top:8px"><b>Seriali PC finiti:</b> ${o.as.seriali.join(', ')}</div>`:''}</div>`}).join(''):'<div class="card empty">Nessun assemblaggio in coda.</div>'}`;
+};
+
+/* ----- commercialista ----- */
+function checks(d){const c=CL(d.cli);return [['Codice SDI o PEC del cliente',!!(c.sdi||c.pec)],['Partita IVA o codice fiscale',c.tipo==='Privato'||!!c.piva],['Aliquota IVA su ogni riga',true],['Collegato al preventivo accettato',true]]}
+V.commercialista=()=>{
+ const est=R()==='est';
+ const L=S.docs;
+ return `<div class="crumb">Commercialista</div><div class="hrow"><h1>${est?'Documenti affidati allo studio':'Documenti per il commercialista'}</h1><span class="small mut">Il CRM non emette fatture: prepara e invia i dati allo studio.</span><span class="sp"></span>${!est&&L.length?'<button class="btn" data-a="esporta" id="btn-esporta">Esporta pacchetto</button>':''}</div>
+ ${L.length?`<div class="card p0"><table class="stack"><thead><tr><th>Documento</th><th>Cliente</th><th>Controlli</th><th>Stato</th><th></th></tr></thead><tbody>${L.map(d=>{const ck=checks(d),ok=ck.every(x=>x[1]);const st=d.stato==='Da inviare'&&!ok?'Dati incompleti':d.stato;return `<tr><td><b>${d.tipo}</b><div class="small mut">${d.rif}</div></td><td>${esc(CL(d.cli).nome)}</td><td class="small">${ck.map(x=>`<div class="${x[1]?'ok-i':'ko-i'}">${x[1]?'✓':'✕'} <span style="color:var(--ink);font-weight:400">${x[0]}</span></div>`).join('')}</td><td>${tag(st,stTag(st))}${d.esito?`<div class="small mut">${esc(d.esito)}</div>`:''}</td>
+ <td class="n">${!est&&['Da inviare','Da correggere'].includes(d.stato)?(ok?`<button class="btn sm pri" data-a="inviaDoc" data-d="${d.id}" id="inv-${d.id}">Invia allo studio</button>`:`<button class="btn sm" data-a="go" data-v="clienti" data-s="${d.cli}" data-tab="fisc" id="fix-${d.id}">Completa i dati</button>`):''}${est&&d.stato==='Inviato allo studio'?`<button class="btn sm ok" data-a="registra" data-d="${d.id}" id="reg-${d.id}">Registra esito</button>`:''}</td></tr>`}).join('')}</tbody></table></div>`:'<div class="card empty">Nessun documento: arrivano quando un cliente accetta un preventivo.</div>'}
+ <div class="card small mut" style="margin-top:12px">Modalità di invio configurata: <b>file firmato via PEC allo studio</b>. In alternativa: collegamento API al gestionale dello studio (da confermare con lo studio).</div>`;
+};
+
+/* ----- impostazioni ----- */
+V.impostazioni=()=>{const rg=S.regole;return `<div class="crumb">Impostazioni</div><div class="hrow"><h1>Impostazioni</h1></div>
+ <div class="grid side2"><div class="card"><h2>Preventivi e deleghe · chi invia senza passare dall'amministratore</h2><table><thead><tr><th>Ruolo</th><th class="n">Sconto massimo %</th><th class="n">Importo massimo €</th></tr></thead><tbody>
+ ${['comm','acc','amm'].map(r=>`<tr><td>${ROLES[r]}</td><td class="n"><input class="in" style="width:90px;text-align:right" type="number" value="${rg[r].sc}" data-ch="reg.${r}.sc"></td><td class="n"><input class="in" style="width:120px;text-align:right" type="number" value="${rg[r].imp}" data-ch="reg.${r}.imp"></td></tr>`).join('')}
+ <tr><td>Margine minimo (tutti)</td><td class="n"><input class="in" style="width:90px;text-align:right" type="number" value="${rg.margine}" data-ch="reg.margine"></td><td></td></tr></tbody></table>
+ <div class="small mut" style="margin-top:8px">Se l'amministratore non risponde: promemoria dopo ${rg.promemoria} ore lavorative, poi passa al vice (${U(rg.vice).n}).</div></div>
+ <div class="card"><h2>Collega una stampante</h2><div class="grid g2">${['AirPrint','Bluetooth','Rete (IP)','USB'].map(x=>`<button class="btn" data-a="addPrn" data-c="${x}">${x}</button>`).join('')}</div><div class="small mut" style="margin-top:8px">Nel CRM reale la stampa passa dal sistema del dispositivo; qui viene registrata.</div></div></div>
+ <div class="card p0" style="margin-top:14px"><div style="padding:12px 14px 0"><h2>Stampanti e dispositivi dell'azienda</h2></div><table class="stack"><thead><tr><th>Stampante</th><th>Sede</th><th>Proprietà</th><th>Chi la gestisce · contratto</th><th>Scadenza</th><th class="n">Canone</th></tr></thead><tbody>
+ ${S.stampanti.map(p=>`<tr><td><b>${esc(p.n)}</b><div class="small mut">${esc(p.conn)}</div></td><td>${p.sede}</td><td>${tag(p.prop,p.prop==='Leasing'?'amb':p.prop==='Noleggio'?'vio':'gry')}</td><td>${p.gest?esc(p.gest)+' · '+esc(p.contr):'—'}</td><td>${p.scad?day(p.scad):'—'}</td><td class="n">${p.canone?eur(p.canone)+'/mese':'—'}</td></tr>`).join('')}</tbody></table></div>
+ <div class="card p0" style="margin-top:14px"><div class="row" style="padding:12px 14px 0"><h2>Dispositivi a noleggio o in leasing presso i clienti</h2><span class="sp"></span><button class="btn sm" data-a="nuovoDisp">+ Aggiungi</button></div><table class="stack"><thead><tr><th>Cliente</th><th>Dispositivo</th><th>Gestito da</th><th>Scadenza</th><th class="n">Canone</th></tr></thead><tbody>
+ ${S.dispClienti.map(d=>`<tr><td><b>${esc(d.cli)}</b></td><td>${esc(d.disp)}</td><td>${esc(d.gest)}</td><td>${d.scad?day(d.scad):'—'}</td><td class="n">${eur(d.canone)}/mese</td></tr>`).join('')}</tbody></table></div>
+ <div class="card p0" style="margin-top:14px"><div style="padding:12px 14px 0"><h2>Utenti e permessi · cosa vede ogni ruolo</h2></div><div style="overflow-x:auto"><table><thead><tr><th>Sezione</th>${Object.keys(ROLES).map(r=>`<th class="n">${ROLES[r].split(' ')[0]}</th>`).join('')}</tr></thead><tbody>${NAV.filter(n=>n[0]!=='§').map(n=>`<tr><td>${n[1]}</td>${Object.keys(ROLES).map(r=>`<td class="n">${n[2]==='*'||n[2].split(' ').includes(r)?'<span class="ok-i">✓</span>':'<span class="mut">—</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div><div class="small mut" style="padding:8px 14px 12px">Il commercialista esterno vede solo i documenti affidati allo studio.</div></div>
+ ${S.stampe.length?`<div class="card" style="margin-top:14px"><h2>Ultime stampe</h2>${S.stampe.slice(0,5).map(s=>`<div class="small">${fmt(s.q)} · ${esc(s.doc)} → ${esc(s.prn)} · ${s.u}</div>`).join('')}</div>`:''}`};
+
+V.registro=()=>`<div class="crumb">Registro modifiche</div><div class="hrow"><h1>Registro delle modifiche importanti</h1></div><div class="card p0"><table class="stack"><thead><tr><th>Quando</th><th>Chi</th><th>Cosa</th></tr></thead><tbody>${S.log.map(l=>`<tr><td>${fmt(l.q)}</td><td>${esc(l.u)}</td><td>${esc(l.t)}</td></tr>`).join('')||'<tr><td colspan="3" class="empty">Ancora nessuna modifica.</td></tr>'}</tbody></table></div>`;
+
+/* ---------- azioni ---------- */
+const A={};
+A.go=d=>go(d.v,d.s||null,d.tab||'dati');
+A.tab=d=>{S.tab=d.t;render()};
+A.close=()=>closeM();
+A.ovclose=(d,el,e)=>{if(e.target===el)closeM()};
+A.reset=()=>{modal('Ripristinare la demo?','Tutti i dati tornano all\'esempio iniziale.','<button class="btn" data-a="close">Annulla</button><button class="btn pri" data-a="doReset" id="btn-doreset">Ripristina</button>')};
+A.doReset=()=>{S=seed();closeM();render();toast('Demo ripristinata')};
+A.avvisi=()=>{const L=S.avvisi.filter(a=>a.to===S.me);L.forEach(a=>a.letto=true);modal('Avvisi',L.length?L.map(a=>`<div class="chk"><span class="small mut">${fmt(a.q)}</span><span style="flex:1">${esc(a.t)}</span>${a.go?`<button class="btn sm" data-a="go" data-v="${a.go[0]}" data-s="${a.go[1]||''}" onclick="">Apri</button>`:''}</div>`).join(''):'<div class="empty">Nessun avviso.</div>');render()};
+
+/* nuovo cliente rapido con controllo duplicati */
+const norm=s=>String(s||'').toLowerCase().replace(/[\s.\-+()]/g,'').replace(/^0039/,'');
+A.nuovoCli=()=>{modal('Nuovo cliente rapido',`<div class="grid g2"><div class="f"><label>Tipo</label><select class="in" id="nc-tipo"><option>Azienda</option><option>Privato</option></select></div><div class="f"><label>Canale *</label><select class="in" id="nc-can"><option>Telefono</option><option>Email</option><option>WhatsApp</option><option>Sito web</option><option>Banco</option></select></div>
+ <div class="f"><label>Nome o ragione sociale *</label><input class="in" id="nc-nome" data-dup="1"></div><div class="f"><label>Telefono *</label><input class="in" id="nc-tel" data-dup="1"></div><div class="f"><label>Email</label><input class="in" id="nc-email" data-dup="1"></div><div class="f"><label>Partita IVA</label><input class="in" id="nc-piva" data-dup="1"></div></div>
+ <div id="dup" style="margin-top:10px"></div><div class="f"><label>Nota sulla richiesta</label><textarea class="in" id="nc-nota"></textarea></div>`,`<button class="btn" data-a="close">Annulla</button><button class="btn pri" data-a="salvaCli" id="btn-salvacli">Salva e crea richiesta</button>`)};
+function dupCheck(){const t=norm($('#nc-tel')?.value),e=norm($('#nc-email')?.value),p=norm($('#nc-piva')?.value),n=norm($('#nc-nome')?.value);
+ const m=S.clienti.find(c=>(t.length>5&&norm(c.tel)===t)||(e.length>5&&norm(c.email)===e)||(p.length>8&&norm(c.piva)===p)||(n.length>4&&norm(c.nome).startsWith(n)));
+ $('#dup').innerHTML=m?`<div class="alert a-amb"><span style="flex:1"><b>Possibile scheda esistente:</b> ${esc(m.nome)} · ${esc(m.tel)} · responsabile ${U(m.resp).n}</span><button class="btn sm" data-a="apriDup" data-c="${m.id}" id="btn-apridup">Apri scheda</button></div>`:''}
+A.apriDup=d=>{closeM();go('clienti',d.c)};
+A.salvaCli=()=>{const nome=$('#nc-nome').value.trim(),tel=$('#nc-tel').value.trim();if(!nome||!tel){$('#dup').innerHTML='<div class="alert a-red">Servono almeno nome e telefono.</div>';return}
+ const id='C'+(S.clienti.length+1),tipo=$('#nc-tipo').value;
+ S.clienti.push({id,tipo,nome,piva:$('#nc-piva').value,tel,email:$('#nc-email').value,sdi:'',pec:'',listino:tipo==='Privato'?'Privati':'Aziende B',resp:R()==='comm'?S.me:'mb',canale:$('#nc-can').value,ind:'',ref:[],st:[[now(),'Cliente creato da '+$('#nc-can').value,ME().n]]});
+ const rid=nextId('R','R-2026-');S.richieste.unshift({id:rid,cli:id,titolo:$('#nc-nota').value||'Nuova richiesta',canale:$('#nc-can').value,stato:'Assegnata',resp:R()==='comm'?S.me:'mb',descr:$('#nc-nota').value});
+ notify('mb',`Nuova richiesta ${rid} da ${nome}`,['richieste']);closeM();toast(`Cliente e richiesta ${rid} creati e assegnati`);go('clienti',id)};
+
+A.converti=d=>{const r=S.richieste.find(x=>x.id===d.r);r.stato='Convertita';const c=CL(r.cli);if(!S.trattative.find(t=>t.cli===r.cli&&t.fase!=='vinta'))S.trattative.push({id:'T'+(S.trattative.length+9),cli:r.cli,titolo:r.titolo,fase:'valutazione',val:0,resp:r.resp,rich:r.id});
+ c.st.push([now(),`Richiesta ${r.id} convertita in trattativa`,ME().n]);toast('Richiesta convertita: la trattativa è nel kanban');render()};
+
+/* preventivo */
+A.nuovoPv=d=>{const cli=d.c;modal('Nuovo preventivo',`<div class="grid g2"><div class="f"><label>Cliente</label><select class="in" id="np-cli">${S.clienti.map(c=>`<option value="${c.id}" ${c.id===cli?'selected':''}>${esc(c.nome)}</option>`).join('')}</select></div>
+ <div class="f"><label>Parti da un modello</label><select class="in" id="np-mod"><option value="ufficio">Postazione ufficio CAD (5 PC, monitor, installazione, stampante, software)</option><option value="vuoto">Preventivo vuoto</option></select></div></div>
+ <div class="small mut" style="margin-top:8px">Il listino del cliente viene applicato da solo. Il responsabile della pratica sei tu: ${ME().n}.</div>`,`<button class="btn" data-a="close">Annulla</button><button class="btn pri" data-a="creaPv" id="btn-creapv">Crea preventivo</button>`)};
+A.creaPv=()=>{const cli=$('#np-cli').value,mod=$('#np-mod').value,c=CL(cli);const id='PV-2026-'+pad(++S.seq.PV,3);
+ const righe=mod==='ufficio'?[{code:'PC-WS-140',qty:5,sc:0},{code:'MON-27Q',qty:10,sc:0},{code:'SRV-INST',qty:1,sc:0},{code:'NOL-MFA3',qty:1,sc:0},{code:'GEST-TEAM',qty:5,sc:0},{code:'M365-BS',qty:5,sc:0}]:[];
+ S.preventivi.unshift({id,cli,resp:S.me,listino:c.listino,righe,stato:'Bozza',ver:1,st:[[now(),'Creato da modello '+(mod==='ufficio'?'«Postazione ufficio CAD»':'vuoto'),ME().n]]});
+ const t=S.trattative.find(x=>x.cli===cli&&!['vinta','persa'].includes(x.fase));if(t){t.fase='preventivo';t.pv=id}
+ c.st.push([now(),`Preventivo ${id} in preparazione`,ME().n]);closeM();toast(`Preventivo ${id} creato con il listino ${c.listino}`);go('preventivi',id)};
+const curPv=()=>S.preventivi.find(p=>p.id===S.sel);
+A.addRiga=()=>{const p=curPv(),code=$('#add-code').value;const r=p.righe.find(x=>x.code===code);r?r.qty++:p.righe.push({code,qty:1,sc:0});render()};
+A.delRiga=d=>{curPv().righe.splice(+d.k,1);render()};
+A.pvInvia=()=>{const p=curPv();if(!p.righe.length)return toast('Aggiungi almeno una riga');if(p.stato==='Rifiutato'){p.ver++;p.st.push([now(),'Nuova versione '+p.ver,ME().n])}const m=motivi(p,U(p.resp).r);
+ if(m.length){p.stato='In approvazione';p.st.push([now(),'Inviato in approvazione: '+m.join('; '),ME().n]);notify('nb',`${p.id} da approvare: ${m[0]}`,['preventivi',p.id]);toast('Va all\'amministratore: '+m[0])}
+ else{p.stato='Approvato';p.st.push([now(),'Confermato entro le regole del ruolo: pronto da inviare',ME().n]);toast('Entro le regole: pronto da inviare')}render()};
+A.appr=()=>{const p=curPv();p.stato='Approvato';p.ver++;p.st.push([now(),`Approvato dall'amministratore (versione ${p.ver})`,ME().n]);log(`Approvato ${p.id}: ${motivi(p,U(p.resp).r).join('; ')||'sconto'}`);notify(p.resp,`${p.id} approvato: puoi inviarlo al cliente`,['preventivi',p.id]);toast('Approvato. Il responsabile riceve l\'avviso.');render()};
+A.rifiuta=()=>{const p=curPv();p.stato='Rifiutato';p.st.push([now(),'Rifiutato: rivedere lo sconto',ME().n]);log(`Rifiutato ${p.id}`);notify(p.resp,`${p.id} rifiutato: rivedi lo sconto`,['preventivi',p.id]);render()};
+A.pvMail=()=>{const p=curPv(),c=CL(p.cli);p.stato='Inviato';p.st.push([now(),`Inviato via email a ${c.ref[0]?.[3]||c.email} con link alla pagina del preventivo e PDF`,ME().n]);c.st.push([now(),`Preventivo ${p.id} inviato`,ME().n]);
+ const t=S.trattative.find(x=>x.cli===p.cli&&x.pv===p.id);if(t){t.fase='attesa';t.val=totals(p).one}toast(`Email registrata nello storico. Nella demo nessuna email parte davvero.`);render()};
+A.portale=()=>{modal('Pagina del preventivo · vista del cliente',portaleHTML(curPv()),'',true)};
+A.stampa=()=>{const p=curPv();modal('Stampa del preventivo',`<div class="grid g2"><div class="f"><label>Stampante</label><select class="in" id="prn">${S.stampanti.filter(s=>s.on).map(s=>`<option>${esc(s.n)}</option>`).join('')}</select></div><div class="f"><label>Copie</label><input class="in" type="number" value="1" min="1"></div></div><div class="small mut" style="margin-top:8px">Nel CRM reale apre la stampa del dispositivo (AirPrint, rete, USB). Qui la stampa viene registrata.</div>`,`<button class="btn" data-a="close">Annulla</button><button class="btn pri" data-a="doStampa" id="btn-dostampa">Stampa</button>`)};
+A.doStampa=()=>{const p=curPv();S.stampe.unshift({q:now(),doc:p.id,prn:$('#prn').value,u:ME().n});p.st.push([now(),'Stampato su '+$('#prn').value,ME().n]);closeM();toast('Stampa registrata su '+esc(S.stampe[0].prn));render()};
+A.modifica=()=>{const p=curPv();p.st.push([now(),'Il cliente chiede una modifica',CL(p.cli).nome]);notify(p.resp,`${CL(p.cli).nome} chiede una modifica a ${p.id}`,['preventivi',p.id]);closeM();toast('Richiesta di modifica inviata al responsabile');render()};
+A.accetta=()=>{const p=curPv(),nome=$('#acc-nome').value.trim();if(!nome||!$('#acc-ok').checked)return toast('Serve il nome e la conferma');
+ p.stato='Accettato';p.acc={nome,q:now()};const c=CL(p.cli);
+ const oid='OC-'+(++S.seq.OC);const o={id:oid,pv:p.id,cli:p.cli,stato:'In approvvigionamento',righe:p.righe.filter(r=>!recurring(r.code)).map(r=>({...r})),as:{stato:'In attesa pezzi'}};
+ S.ordini.unshift(o);p.ord=oid;p.st.push([o&&now(),`Accettato e firmato online da ${nome} · creato l'ordine del cliente ${oid}`,c.nome]);
+ const t=S.trattative.find(x=>x.cli===p.cli&&x.pv===p.id);if(t){t.fase='vinta';t.val=totals(p).one}
+ c.st.push([now(),`Preventivo ${p.id} accettato · ordine ${oid}`,nome]);
+ ['Preventivo accettato','Ordine del cliente','Canoni da attivare'].forEach((tp,k)=>S.docs.push({id:'DOC-'+(++S.seq.DOC),tipo:tp,rif:[p.id,oid,'3 voci mensili · competenza da 12/2026'][k],cli:p.cli,stato:'Da inviare'}));
+ notify(p.resp,`${c.nome} ha accettato ${p.id}: creato ${oid}`,['ordini',oid]);notify('sc',`Nuovo ordine del cliente ${oid}: trova i pezzi`,['ordini',oid]);notify('lm',`Nuovo assemblaggio per ${oid}`,['assemblaggio']);notify('ac',`3 documenti di ${c.nome} da inviare al commercialista`,['commercialista']);
+ closeM();toast(`Accettato! Creato l'ordine del cliente ${oid}`);render()};
+
+/* fabbisogno: proposta automatica */
+function piano(o){const out=[];fabbisogno(o).forEach(x=>{let m=x.manca;if(!m)return;
+ const fc=Math.min(m,libero(x.code,'Centrale'));if(fc>0){out.push({k:'ris',code:x.code,qty:fc});m-=fc}
+ SEDI.slice(1).forEach(s=>{if(m<=0)return;const l=libero(x.code,s),q=Math.min(m,l);if(q>0){out.push({k:'tr',code:x.code,qty:q,da:s});m-=q}});
+ if(m>0){const f=[...S.fornitori].sort((a,b)=>a.gg-b.gg)[0];out.push({k:'po',code:x.code,qty:m,forn:f.n,gg:f.gg})}});return out}
+A.proponi=()=>{const o=S.ordini.find(x=>x.id===S.sel),pl=piano(o);
+ modal('Proposta per coprire i pezzi',`<table><thead><tr><th>Azione</th><th>Articolo</th><th class="n">Q.tà</th><th>Dettaglio</th></tr></thead><tbody>${pl.map(a=>`<tr><td>${a.k==='ris'?tag('Riserva','grn'):a.k==='tr'?tag('Trasferisci','amb'):tag('Ordina','blu')}</td><td>${esc(IT(a.code).n)}</td><td class="n">${a.qty}</td><td class="small">${a.k==='ris'?'Pezzi liberi al Centrale':a.k==='tr'?`Da ${a.da} al Centrale, con bolla`:`${a.forn}, arrivo in ${a.gg} giorni`}</td></tr>`).join('')}</tbody></table><div class="small mut" style="margin-top:8px">Prima i pezzi liberi della sede di lavoro, poi gli altri negozi, infine il fornitore più rapido. Si può modificare a mano.</div>`,
+ `<button class="btn" data-a="close">Annulla</button><button class="btn pri" data-a="applica" id="btn-applica">Applica la proposta</button>`,true)};
+A.applica=()=>{const o=S.ordini.find(x=>x.id===S.sel),pl=piano(o);const trBy={},poBy={};
+ pl.forEach(a=>{if(a.k==='ris')S.riserve.push({id:'RS-'+Math.random().toString(36).slice(2,6),ord:o.id,code:a.code,sede:'Centrale',qty:a.qty,tec:'lm'});
+  if(a.k==='tr'){(trBy[a.da]=trBy[a.da]||[]).push(a)}if(a.k==='po'){(poBy[a.forn]=poBy[a.forn]||[]).push(a)}});
+ Object.entries(trBy).forEach(([da,L])=>{L.forEach(a=>S.riserve.push({id:'RS-'+Math.random().toString(36).slice(2,6),ord:o.id,code:a.code,sede:da,qty:a.qty,tec:'lm',viaggio:true}));
+  creaTrasf(da,'Centrale',L.map(a=>({code:a.code,qty:a.qty})),o.id,true)});
+ Object.entries(poBy).forEach(([f,L])=>{const fo=S.fornitori.find(x=>x.n===f);const id='PO-0'+(++S.seq.PO);S.po.push({id,forn:f,comm:o.id,righe:L.map(a=>({code:a.code,qty:a.qty,ric:0})),stato:'Ordinato',arrivo:new Date(clock.getTime()+fo.gg*864e5)})});
+ log(`Riserve, trasferimenti e ordini ai fornitori per ${o.id}`);closeM();toast('Pezzi riservati, trasferimenti e ordini creati');render()};
+
+/* trasferimenti */
+function creaTrasf(da,a,righe,comm,giaRis){const id='TR-2026-'+pad(++S.seq.TR,3),ddt='DT-2026-'+pad(++S.seq.DT,4);const res=[];let bloccati=[];
+ righe.forEach(r=>{let sped;if(giaRis){sped=r.qty;S.riserve=S.riserve.filter(x=>!(x.viaggio&&x.ord===comm&&x.code===r.code&&x.sede===da))}else{sped=Math.min(r.qty,Math.max(0,libero(r.code,da)))}
+  const bloc=r.qty-sped;if(bloc>0&&riservato(r.code,da)>0)bloccati.push({code:r.code,qty:bloc,sede:da});
+  S.stock[r.code][da]-=sped;res.push({code:r.code,qty:r.qty,sped,bloc:bloc>0?bloc:0})});
+ const t={id,da,a,righe:res,comm,ddt,corr:'Corriere convenzionato',track:String(80000000000+Math.floor(Math.random()*9e9)).slice(0,12),stato:'Bolla creata',q:now()};S.trasf.unshift(t);
+ bloccati.forEach(b=>{const rs=S.riserve.find(x=>x.code===b.code&&x.sede===b.sede);const msg=`${ME().n} ha chiesto ${b.qty} × ${IT(b.code).n} da ${b.sede}: il pezzo è riservato per ${rs.ord} e non è partito.`;
+  S.avvisi.unshift({id:'BL'+Math.random().toString(36).slice(2,6),to:rs.tec,t:msg,blocco:true,ris:rs.id,q:now(),letto:false});log('Blocco momentaneo: '+msg)});
+ return {t,bloccati}}
+A.nuovoTr=()=>{const codes=Object.values(S.catalog).filter(i=>['componente','finito'].includes(i.t));
+ modal('Nuovo trasferimento tra sedi',`<div class="grid g3"><div class="f"><label>Da</label><select class="in" id="tr-da">${SEDI.map(s=>`<option ${s==='Sede 2'?'selected':''}>${s}</option>`).join('')}</select></div><div class="f"><label>A</label><select class="in" id="tr-a">${SEDI.map(s=>`<option ${s==='Sede 3'?'selected':''}>${s}</option>`).join('')}</select></div><div class="f"><label>Quantità</label><input class="in" type="number" id="tr-q" value="1" min="1"></div></div>
+ <div class="f" style="margin-top:10px"><label>Articolo</label><select class="in" id="tr-c">${codes.map(i=>`<option value="${i.c}" ${i.c==='SSD-NV-1T'?'selected':''}>${esc(i.n)}</option>`).join('')}</select></div>
+ <div class="alert a-blu" style="margin-top:10px">I pezzi liberi partono subito, senza autorizzazione, con bolla e corriere. I pezzi riservati ad altri assemblaggi restano bloccati e il tecnico viene avvisato.</div>`,
+ `<button class="btn" data-a="close">Annulla</button><button class="btn pri" data-a="creaTr" id="btn-creatr">Genera bolla e trasferisci</button>`)};
+A.creaTr=()=>{const da=$('#tr-da').value,a=$('#tr-a').value,q=+$('#tr-q').value,c=$('#tr-c').value;if(da===a)return toast('Scegli due sedi diverse');
+ const {t,bloccati}=creaTrasf(da,a,[{code:c,qty:q}],null,false);closeM();
+ toast(bloccati.length?`Partiti ${t.righe[0].sped} pezzi con bolla ${t.ddt}. ${bloccati[0].qty} bloccati: avvisato il tecnico.`:`Bolla ${t.ddt} creata, ${t.righe[0].sped} pezzi in partenza`);render()};
+A.avanza=d=>{const t=S.trasf.find(x=>x.id===d.t),nx={'Bolla creata':'Ritirato','Ritirato':'In transito','In transito':'Ricevuto'};t.stato=nx[t.stato];
+ if(t.stato==='Ricevuto'){t.righe.forEach(r=>{S.stock[r.code][t.a]+=r.sped;if(t.comm)S.riserve.push({id:'RS-'+Math.random().toString(36).slice(2,6),ord:t.comm,code:r.code,sede:t.a,qty:r.sped,tec:'lm'})});toast(`Ricevuto in ${t.a}: seriali controllati con la bolla ${t.ddt}`)}
+ checkReady();render()};
+A.mantieni=d=>{const b=S.avvisi.find(x=>x.id===d.id);b.chiuso=true;log('Riserva mantenuta: '+b.t);toast('Riserva mantenuta. Decisione salvata nello storico.');render()};
+A.rilascia=d=>{const b=S.avvisi.find(x=>x.id===d.id);b.chiuso=true;S.riserve=S.riserve.filter(r=>r.id!==b.ris);log('Pezzo rilasciato: '+b.t);toast('Pezzo rilasciato: ora è libero');render()};
+
+/* fornitori */
+A.ricevi=d=>{const p=S.po.find(x=>x.id===d.p);p.righe.forEach(r=>{const q=r.qty-r.ric;r.ric=r.qty;S.stock[r.code].Centrale+=q;if(p.comm!=='Scorta')S.riserve.push({id:'RS-'+Math.random().toString(36).slice(2,6),ord:p.comm,code:r.code,sede:'Centrale',qty:q,tec:'lm'})});p.stato='Ricevuto';log(`Ricevuto ${p.id} da ${p.forn}`);toast(`Merce di ${p.forn} ricevuta al Centrale e riservata per ${p.comm}`);checkReady();render()};
+A.regTel=(d,el,e,cti)=>{modal(cti?'Chiamata dal CRM (centralino)':'Registra telefonata',`<div class="grid g2"><div class="f"><label>Fornitore</label><select class="in" id="tl-f">${S.fornitori.map(f=>`<option>${f.n}</option>`).join('')}</select></div><div class="f"><label>Ha telefonato *</label><select class="in" id="tl-chi" ${cti?'disabled':''}>${USERS.filter(u=>u.r!=='est').map(u=>`<option value="${u.id}" ${u.id===S.me?'selected':''}>${u.n}</option>`).join('')}</select></div>
+ <div class="f"><label>Per l'ordine del cliente</label><select class="in" id="tl-c">${S.ordini.map(o=>`<option>${o.id}</option>`).join('')}</select></div><div class="f"><label>Registrato da</label><div class="in" style="display:flex;align-items:center">${ME().n} (automatico)</div></div></div>
+ <div class="f" style="margin-top:10px"><label>Esito</label><input class="in" id="tl-e" value="${cti?'Confermati 5 RTX 4060, arrivo in 3 giorni':''}"></div>
+ <div class="alert a-vio" style="margin-top:10px;background:var(--vio);color:var(--viok);border:1px solid #cdbaf5"><b>Suggerimento:</b>&nbsp;${sugg()}</div>${cti?'<div class="small mut">Origine: centralino collegato · chi chiama è riconosciuto dal suo interno.</div>':''}`,
+ `<button class="btn" data-a="close">Annulla</button><button class="btn pri" data-a="salvaTel" data-cti="${cti?1:''}" id="btn-salvatel">Salva nel registro</button>`)};
+A.chiama=()=>A.regTel({},null,null,true);
+function sugg(){const o=S.ordini.find(x=>x.id!=='OC-399'&&fabbisogno(x).some(f=>f.manca||f.ord));if(!o)return 'nessun pezzo mancante: nessuna chiamata urgente.';const f=fabbisogno(o).find(x=>x.manca||x.ord),fast=[...S.fornitori].sort((a,b)=>a.gg-b.gg)[0],cheap=[...S.fornitori].sort((a,b)=>a.k-b.k)[0];
+ return `per ${o.id} servono ancora ${f.manca||f.ord} × ${IT(f.code).n}. Più rapido: ${fast.n} (${fast.gg} giorni). Più economico: ${cheap.n}. Decidi tu.`}
+A.salvaTel=d=>{S.calls.push({id:'TEL-0'+(++S.seq.TEL),q:now(),forn:$('#tl-f').value,chi:d.cti?S.me:$('#tl-chi').value,reg:S.me,comm:$('#tl-c').value,esito:$('#tl-e').value||'—',orig:d.cti?'Centralino':'Manuale'});closeM();toast('Telefonata registrata: si sa chi ha chiamato');render()};
+
+/* assemblaggio */
+function checkReady(){S.ordini.forEach(o=>{if(o.as&&o.as.stato==='In attesa pezzi'&&o.id!=='OC-399'&&pronto(o)){notify('lm',`${o.id}: tutti i pezzi sono pronti, puoi avviare l'assemblaggio`,['assemblaggio']);o.stato='In approvvigionamento'}})}
+A.avvia=d=>{const o=S.ordini.find(x=>x.id===d.o);o.as.stato='In lavorazione';o.stato='In assemblaggio';log(`Avviato assemblaggio ${o.id}`);toast('Assemblaggio avviato');render()};
+A.seriali=d=>{const o=S.ordini.find(x=>x.id===d.o),n=o.righe.filter(r=>IT(r.code).bom).reduce((a,r)=>a+r.qty,0);o.as.seriali=Array.from({length:n},()=>'NB-PC-'+(++S.seq.SN)+'-26');
+ fabbisogno(o).forEach(x=>{S.stock[x.code].Centrale-=x.q;S.riserve=S.riserve.filter(r=>!(r.ord===o.id&&r.code===x.code&&r.sede==='Centrale'))});
+ o.as.stato='Completato';o.stato='Pronto';notify('sc',`${o.id} pronto per la spedizione`,['ordini',o.id]);log(`Chiuso assemblaggio ${o.id}: seriali ${o.as.seriali.join(', ')}`);toast(`${n} PC finiti, seriali registrati`);render()};
+A.consegna=()=>{const o=S.ordini.find(x=>x.id===S.sel);o.stato='Consegnato';CL(o.cli).st.push([now(),`Ordine ${o.id} consegnato e firmato dal cliente`,ME().n]);notify(S.preventivi.find(p=>p.id===o.pv).resp,`${o.id} consegnato a ${CL(o.cli).nome}`,['ordini',o.id]);toast('Consegnato: pratica chiusa');render()};
+A.spedisci=()=>{const o=S.ordini.find(x=>x.id===S.sel);o.stato='Spedito';o.track='BRT '+String(Math.floor(Math.random()*9e11));CL(o.cli).st.push([now(),`Ordine ${o.id} spedito · ${o.track}`,ME().n]);toast('Ordine spedito con tracking');render()};
+
+/* commercialista */
+A.inviaDoc=d=>{const x=S.docs.find(y=>y.id===d.d);x.stato='Inviato allo studio';x.esito='Inviato via PEC il '+fmt(now());log(`Inviato allo studio: ${x.tipo} ${x.rif}`);notify('st',`Nuovo documento: ${x.tipo} ${x.rif}`,['commercialista']);toast('Inviato allo studio');render()};
+A.registra=d=>{const x=S.docs.find(y=>y.id===d.d);x.stato='Registrato';x.esito='Registrato dallo studio · rif. '+(x.tipo==='Canoni da attivare'?'CAN-':'FT-')+'2026/'+(1180+S.docs.indexOf(x));notify('ac',`Lo studio ha registrato ${x.tipo} ${x.rif}`,['commercialista']);toast('Esito registrato');render()};
+A.esporta=()=>{const pk=S.docs.map(d=>{const c=CL(d.cli),p=S.preventivi.find(q=>q.id===d.rif||q.ord===d.rif);return {documento:d.tipo,riferimento:d.rif,cliente:{nome:c.nome,piva:c.piva,sdi:c.sdi,pec:c.pec},righe:p?p.righe.map(r=>({codice:r.code,descrizione:IT(r.code).n,quantita:r.qty,prezzo:price(r.code,p.listino),sconto:r.sc,iva:22,ricorrente:recurring(r.code)})):[]}});
+ const txt=JSON.stringify(pk,null,1);modal('Pacchetto per lo studio',`<div class="small mut" style="margin-bottom:8px">Formato di scambio della demo. Il formato definitivo si concorda con lo studio.</div><pre style="max-height:50vh;overflow:auto;background:var(--soft);padding:10px;border-radius:8px;font-size:12px">${esc(txt)}</pre>`,`<button class="btn pri" data-a="copia" id="btn-copia">Copia</button>`,true);window.__pk=txt};
+A.copia=()=>{navigator.clipboard?.writeText(window.__pk).then(()=>toast('Copiato'),()=>toast('Copia non consentita in questa finestra'))};
+
+/* impostazioni */
+A.addPrn=d=>modal('Collega stampante · '+esc(d.c),`<div class="grid g2">${inp('Nome','pr-n','Stampante '+d.c)}${inp(d.c==='Rete (IP)'?'Indirizzo IP':'Connessione','pr-conn',d.c==='Rete (IP)'?'192.168.1.':d.c)}${sel('Sede','pr-sede',SEDI)}${sel('Proprietà','pr-prop',['Di proprietà','Leasing','Noleggio'])}${inp('Società che la gestisce (leasing/noleggio)','pr-gest','')}${inp('N. contratto','pr-contr','')}${inp('Scadenza contratto','pr-scad','','date')}${inp('Canone mensile €','pr-can','0','number')}</div><div class="alert a-blu" style="margin-top:10px">Il capo vede subito proprietà, società, contratto, scadenza e costo: niente da cercare altrove.</div>`,`<button class="btn" data-a="close">Annulla</button><button class="btn pri" data-a="salvaPrn" id="btn-salvaprn">Collega e salva</button>`);
+A.salvaPrn=()=>{const v=id=>$('#'+id).value;S.stampanti.push({n:v('pr-n'),conn:v('pr-conn'),sede:v('pr-sede'),prop:v('pr-prop'),gest:v('pr-gest'),contr:v('pr-contr'),scad:v('pr-scad'),canone:+v('pr-can')||0,on:true});log('Collegata stampante '+v('pr-n')+' ('+v('pr-prop')+')');closeM();toast('Stampante collegata');render()};
+A.nuovoDisp=()=>modal('Dispositivo presso un cliente',`<div class="grid g2">${sel('Cliente','dc-cli',S.clienti.map(c=>c.nome))}${inp('Dispositivo','dc-disp','2 stampanti A4 a noleggio')}${inp('Gestito da','dc-gest','Beta Office Service')}${inp('Scadenza','dc-scad','','date')}${inp('Canone mensile €','dc-can','60','number')}</div>`,`<button class="btn" data-a="close">Annulla</button><button class="btn pri" data-a="salvaDisp">Salva</button>`);
+A.salvaDisp=()=>{const v=id=>$('#'+id).value;S.dispClienti.push({cli:v('dc-cli'),disp:v('dc-disp'),gest:v('dc-gest'),scad:v('dc-scad'),canone:+v('dc-can')||0});log('Nuovo dispositivo presso '+v('dc-cli'));closeM();toast('Dispositivo registrato');render()};
+
+A.theme=()=>{S.theme=(S.theme||'light')==='light'?'dark':'light';render()};
+A.menu=()=>modal('Menu',`<div class="grid g2">${NAV.filter(n=>n[0]!=='§'&&can(n[0])).map(n=>`<button class="btn" style="justify-content:flex-start;height:44px" data-a="goM" data-v="${n[0]}">${ICO[n[0]]} ${n[1]}</button>`).join('')}</div>`);
+A.goM=d=>{closeM();go(d.v)};
+const inp=(l,id,v='',t='text')=>`<div class="f"><label for="${id}">${l}</label><input class="in" id="${id}" type="${t}" value="${esc(v)}"></div>`;
+const sel=(l,id,opts,cur)=>`<div class="f"><label for="${id}">${l}</label><select class="in" id="${id}">${opts.map(o=>Array.isArray(o)?`<option value="${o[0]}" ${o[0]===cur?'selected':''}>${esc(o[1])}</option>`:`<option ${o===cur?'selected':''}>${esc(o)}</option>`).join('')}</select></div>`;
+const cliOpts=()=>S.clienti.map(c=>[c.id,c.nome]);
+const staff=()=>USERS.filter(u=>!['est'].includes(u.r)).map(u=>[u.id,u.n+' · '+ROLES[u.r]]);
+A.fR=d=>{S.fR=d.f;render()};
+A.nuovaRich=d=>modal('Nuova richiesta',`<div class="grid g2">${sel('Cliente','nr-cli',cliOpts(),d.c||S.sel)}${sel('Canale','nr-can',['Telefono','Email','WhatsApp','Sito web','Banco'])}${inp('Oggetto *','nr-tit','')}${sel('Priorità','nr-prio',['Normale','Urgente'])}${sel('Assegna a','nr-resp',staff().filter(x=>['admin','comm','acc'].includes(U(x[0]).r)),'mb')}</div><div class="f" style="margin-top:10px"><label for="nr-des">Descrizione</label><textarea class="in" id="nr-des"></textarea></div><div class="small mut" style="margin-top:6px">Il cliente non c'è? <a href="#" data-a="nuovoCli">Crea un nuovo cliente</a></div>`,`<button class="btn" data-a="close">Annulla</button><button class="btn pri" data-a="salvaRich" id="btn-salvarich">Crea richiesta</button>`);
+A.salvaRich=()=>{const vals={};['nr-cli','nr-tit','nr-can','nr-prio','nr-resp','nr-des'].forEach(k=>vals[k]=$('#'+k).value);const v=id=>vals[id];if(!v('nr-tit').trim())return toast('Scrivi l\'oggetto della richiesta');const id=nextId('R','R-2026-');
+ S.richieste.unshift({id,cli:v('nr-cli'),titolo:v('nr-tit'),canale:v('nr-can'),prio:v('nr-prio'),stato:'Assegnata',resp:v('nr-resp'),descr:v('nr-des')});
+ CL(v('nr-cli')).st.push([now(),`Richiesta ${id}: ${v('nr-tit')} (${v('nr-can')})`,ME().n]);notify(v('nr-resp'),`Nuova richiesta ${id}${v('nr-prio')==='Urgente'?' URGENTE':''}: ${v('nr-tit')}`,['richieste']);closeM();S.fR='Aperte';toast(`Richiesta ${id} creata e assegnata a ${U(v('nr-resp')).n}`);go('richieste')};
+A.chiudiRich=d=>{const r=S.richieste.find(x=>x.id===d.r);r.stato='Chiusa';CL(r.cli).st.push([now(),`Richiesta ${r.id} chiusa`,ME().n]);toast('Richiesta chiusa');render()};
+A.nuovaTratt=d=>modal('Nuova trattativa',`<div class="grid g2">${sel('Cliente','nt-cli',cliOpts(),d.c||S.sel)}${inp('Oggetto *','nt-tit','')}${inp('Valore stimato €','nt-val','2500','number')}${sel('Probabilità','nt-prob',['10','30','50','70','90'],'50')}${sel('Fase','nt-fase',FASI.slice(0,4),'contatto')}${sel('Responsabile','nt-resp',staff().filter(x=>['admin','comm'].includes(U(x[0]).r)),S.me==='nb'?'mb':S.me)}${inp('Prossima azione','nt-next','Chiamare per fissare un incontro')}${inp('Entro il','nt-q','2026-11-24','date')}</div>`,`<button class="btn" data-a="close">Annulla</button><button class="btn pri" data-a="salvaTratt" id="btn-salvatratt">Crea trattativa</button>`);
+A.salvaTratt=()=>{const v=id=>$('#'+id).value;if(!v('nt-tit').trim())return toast('Scrivi l\'oggetto');const id='T'+(Date.now()%100000);
+ S.trattative.push({id,cli:v('nt-cli'),titolo:v('nt-tit'),val:+v('nt-val')||0,prob:+v('nt-prob'),fase:v('nt-fase'),resp:v('nt-resp'),next:v('nt-next'),quando:v('nt-q')});
+ if(v('nt-q'))S.appunt.push({q:v('nt-q')+'T10:00',titolo:v('nt-next')||v('nt-tit'),cli:v('nt-cli'),chi:v('nt-resp'),tipo:'Richiamo'});
+ CL(v('nt-cli')).st.push([now(),`Trattativa aperta: ${v('nt-tit')}`,ME().n]);notify(v('nt-resp'),`Nuova trattativa: ${CL(v('nt-cli')).nome} · ${v('nt-tit')}`,['trattative']);closeM();toast('Trattativa creata e richiamo messo in calendario');go('trattative')};
+A.apriTratt=d=>{const t=S.trattative.find(x=>x.id===d.t);if(!t)return;const pv=S.preventivi.filter(p=>p.cli===t.cli);
+ modal('Trattativa · '+esc(CL(t.cli).nome),`<div class="grid g2">${inp('Oggetto','et-tit',t.titolo)}${inp('Valore stimato €','et-val',t.val,'number')}${sel('Fase','et-fase',FASI,t.fase)}${sel('Probabilità','et-prob',['10','30','50','70','90'],String(t.prob??50))}${inp('Prossima azione','et-next',t.next||'')}${inp('Entro il','et-q',t.quando||'','date')}</div>
+ <h2 style="margin-top:14px">Preventivi del cliente</h2>${pv.length?pv.map(p=>`<div class="chk"><b>${p.id}</b>${tag(p.stato,stTag(p.stato))}<span class="sp"></span>${eur(totals(p).one)}</div>`).join(''):'<div class="small mut">Nessuno: creane uno da qui.</div>'}`,
+ `<button class="btn" data-a="nuovoPv" data-c="${t.cli}">€ Crea preventivo</button><button class="btn" data-a="go" data-v="clienti" data-s="${t.cli}">Apri cliente</button><button class="btn pri" data-a="salvaET" data-t="${t.id}" id="btn-salvaet">Salva</button>`)};
+A.salvaET=d=>{const t=S.trattative.find(x=>x.id===d.t),v=id=>$('#'+id).value;Object.assign(t,{titolo:v('et-tit'),val:+v('et-val')||0,fase:v('et-fase'),prob:+v('et-prob'),next:v('et-next'),quando:v('et-q'),ferma:false});closeM();toast('Trattativa aggiornata');render()};
+A.nuovoApp=d=>modal('Nuovo appuntamento',`<div class="grid g2">${inp('Titolo *','na-tit','')}${sel('Tipo','na-tipo',['Appuntamento','Installazione','Consegna','Richiamo'])}${sel('Cliente','na-cli',[['','— nessuno —'],...cliOpts()],d.c||'')}${sel('Chi','na-chi',staff(),S.me)}${inp('Giorno','na-g','2026-11-21','date')}${inp('Ora','na-h','10:00','time')}</div>`,`<button class="btn" data-a="close">Annulla</button><button class="btn pri" data-a="salvaApp" id="btn-salvaapp">Salva</button>`);
+A.salvaApp=()=>{const v=id=>$('#'+id).value;if(!v('na-tit').trim())return toast('Scrivi un titolo');S.appunt.push({q:v('na-g')+'T'+v('na-h'),titolo:v('na-tit'),cli:v('na-cli'),chi:v('na-chi'),tipo:v('na-tipo')});if(v('na-cli'))CL(v('na-cli')).st.push([now(),`${v('na-tipo')} fissato: ${v('na-tit')} il ${day(v('na-g'))}`,ME().n]);if(v('na-chi')!==S.me)notify(v('na-chi'),`${v('na-tipo')}: ${v('na-tit')} il ${day(v('na-g'))} alle ${v('na-h')}`,['calendario']);closeM();toast('Appuntamento in calendario');go('calendario')};
+A.nuovoRef=()=>modal('Nuovo referente',`<div class="grid g2">${inp('Nome e cognome *','rf-n','')}${inp('Ruolo','rf-r','Amministrazione')}${inp('Telefono','rf-t','')}${inp('Email','rf-e','')}</div>`,`<button class="btn" data-a="close">Annulla</button><button class="btn pri" data-a="salvaRef" id="btn-salvaref">Aggiungi</button>`);
+A.salvaRef=()=>{const v=id=>$('#'+id).value;if(!v('rf-n').trim())return toast('Serve il nome');const c=CL(S.sel);c.ref.push([v('rf-n'),v('rf-r'),v('rf-t'),v('rf-e')]);c.st.push([now(),'Aggiunto referente '+v('rf-n'),ME().n]);closeM();toast('Referente aggiunto');render()};
+A.addNota=()=>{const t=$('#nota-txt').value.trim();if(!t)return;CL(S.sel).st.push([now(),'Nota: '+t,ME().n]);toast('Nota salvata nello storico');render()};
+A.nuovoArt=()=>modal('Nuovo articolo',`<div class="grid g3">${inp('Codice *','ar-c','')}${inp('Descrizione *','ar-n','')}${sel('Tipo','ar-t',[['componente','Componente'],['finito','Prodotto finito'],['servizio','Servizio'],['canone','Canone (abbonamento)'],['noleggio','Noleggio']])}${inp('Costo €','ar-k','0','number')}${inp('Prezzo Privati €','ar-p0','0','number')}${inp('Prezzo Aziende A €','ar-p1','0','number')}${inp('Prezzo Aziende B €','ar-p2','0','number')}${inp('Sconto max senza approvazione %','ar-sc','10','number')}${inp('Durata (mesi, per canoni/noleggi)','ar-d','','number')}</div>`,`<button class="btn" data-a="close">Annulla</button><button class="btn pri" data-a="salvaArt" id="btn-salvaart">Salva articolo</button>`,true);
+A.salvaArt=()=>{const v=id=>$('#'+id).value,c=v('ar-c').trim().toUpperCase();if(!c||!v('ar-n').trim())return toast('Servono codice e descrizione');if(S.catalog[c])return toast('Codice già esistente');
+ S.catalog[c]={c,n:v('ar-n'),t:v('ar-t'),costo:+v('ar-k')||0,p:[+v('ar-p0')||0,+v('ar-p1')||0,+v('ar-p2')||0],sc:+v('ar-sc')||0,durata:+v('ar-d')||undefined};S.stock[c]={};SEDI.forEach(s=>S.stock[c][s]=0);log('Nuovo articolo '+c);closeM();toast('Articolo aggiunto al catalogo');go('catalogo',c)};
+A.nuovoForn=()=>modal('Nuovo fornitore',`<div class="grid g3">${inp('Ragione sociale *','fo-n','')}${inp('Giorni di consegna','fo-g','4','number')}${inp('Prezzo rispetto alla media %','fo-k','0','number')}${inp('Telefono','fo-t','')}${inp('Email ordini','fo-e','')}</div>`,`<button class="btn" data-a="close">Annulla</button><button class="btn pri" data-a="salvaForn" id="btn-salvaforn">Salva</button>`,true);
+A.salvaForn=()=>{const v=id=>$('#'+id).value;if(!v('fo-n').trim())return toast('Serve il nome');S.fornitori.push({n:v('fo-n'),gg:+v('fo-g')||4,k:1+(+v('fo-k')||0)/100,tel:v('fo-t'),email:v('fo-e')});log('Nuovo fornitore '+v('fo-n'));closeM();toast('Fornitore aggiunto');render()};
+A.nuovoPO=()=>modal('Ordine al fornitore',`<div class="grid g2">${sel('Fornitore','po-f',S.fornitori.map(f=>f.n))}${sel('Articolo','po-c',Object.values(S.catalog).filter(i=>['componente','finito'].includes(i.t)).map(i=>[i.c,i.n]))}${inp('Quantità','po-q','5','number')}${sel('Per','po-per',['Scorta magazzino',...S.ordini.filter(o=>o.id!=='OC-399').map(o=>o.id)])}</div><div class="small mut" style="margin-top:8px">La merce arriva al Centrale. Se è per un ordine del cliente, viene riservata da sola.</div>`,`<button class="btn" data-a="close">Annulla</button><button class="btn pri" data-a="salvaPO" id="btn-salvapo">Invia ordine</button>`);
+A.salvaPO=()=>{const v=id=>$('#'+id).value,f=S.fornitori.find(x=>x.n===v('po-f'));const id='PO-0'+(++S.seq.PO);S.po.push({id,forn:f.n,comm:v('po-per')==='Scorta magazzino'?'Scorta':v('po-per'),righe:[{code:v('po-c'),qty:+v('po-q')||1,ric:0}],stato:'Ordinato',arrivo:new Date(clock.getTime()+f.gg*864e5)});log(`Ordine ${id} a ${f.n}`);closeM();toast(`Ordine ${id} inviato a ${f.n}`);render()};
+/* ⌘K */
+let palSel=0;
+A.pal=()=>{modal('Cerca o fai',`<div class="pal"><input id="pal-in" placeholder="Scrivi un cliente, PV, OC, articolo…" autocomplete="off"><div id="pal-r"></div></div><div class="small mut" style="padding:8px 0 0">↑ ↓ per scegliere · Invio per aprire</div>`);$('#pal-in').focus();palRun()};
+function palItems(q){q=q.toLowerCase();const out=[];
+ S.clienti.forEach(c=>(c.nome+c.tel+c.piva).toLowerCase().includes(q)&&out.push(['Cliente',c.nome,['clienti',c.id]]));
+ S.preventivi.forEach(p=>(p.id+CL(p.cli).nome).toLowerCase().includes(q)&&out.push(['Preventivo',p.id+' · '+p.stato,['preventivi',p.id]]));
+ S.ordini.filter(o=>o.id!=='OC-399').forEach(o=>(o.id+CL(o.cli).nome).toLowerCase().includes(q)&&out.push(['Ordine del cliente',o.id+' · '+o.stato,['ordini',o.id]]));
+ Object.values(S.catalog).forEach(i=>(i.c+i.n).toLowerCase().includes(q)&&out.push(['Articolo',i.n,['catalogo',i.c]]));
+ const acts=[['Azione','Nuovo cliente rapido','nuovoCli'],['Azione','Nuovo preventivo da modello','nuovoPv'],['Azione','Nuovo trasferimento tra sedi','nuovoTr'],['Azione','Registra una telefonata','regTel'],['Azione','Nuova richiesta','nuovaRich'],['Azione','Nuova trattativa','nuovaTratt'],['Azione','Nuovo appuntamento','nuovoApp'],['Azione','Nuovo articolo','nuovoArt'],['Azione','Nuovo ordine al fornitore','nuovoPO']];
+ return out.filter(x=>can(x[2][0])).slice(0,8).concat(acts.filter(a=>a[1].toLowerCase().includes(q)||!q))}
+function palRun(){const L=palItems($('#pal-in').value);palSel=Math.min(palSel,L.length-1);$('#pal-r').innerHTML=L.map((x,k)=>`<div class="it ${k===palSel?'sel':''}" data-a="palGo" data-k="${k}">${tag(x[0],x[0]==='Azione'?'gry':'blu')}<b>${esc(x[1])}</b></div>`).join('')||'<div class="empty">Nessun risultato</div>';window.__pl=L}
+A.palGo=d=>{const x=(window.__pl||[])[+d.k];if(!x)return;closeM();if(typeof x[2]==='string')A[x[2]]({});else go(x[2][0],x[2][1])};
+
+/* ---------- eventi ---------- */
+document.addEventListener('click',e=>{if(e.target.closest('select,input,textarea')&&!e.target.matches('[data-a]'))return;const el=e.target.closest('[data-a]');if(!el)return;if(el.tagName==='A')e.preventDefault();const f=A[el.dataset.a];if(f){if(el.dataset.a!=='ovclose')e.stopPropagation();f(el.dataset,el,e)}});
+document.addEventListener('change',e=>{const el=e.target,k=el.dataset.ch;if(!k)return;
+ if(k==='fase'){const t=S.trattative.find(x=>x.id===el.dataset.t);t.fase=el.value;t.ferma=false;toast(`${CL(t.cli).nome}: fase «${FASI.find(f=>f[0]===t.fase)[1]}»`);render();return}
+ if(k==='me'){S.me=el.value;S.view='dash';S.sel=null;render();toast('Ora sei '+ME().n+' · '+ROLES[R()]);return}
+ if(k.startsWith('cli.')){const c=CL(S.sel),f=k.slice(4);const old=c[f];c[f]=el.value;if(['listino','resp','sdi','pec','piva'].includes(f))log(`${c.nome}: ${f} da «${old||'—'}» a «${el.value}»`);render();return}
+ if(k.startsWith('riga.')){const p=curPv(),r=p.righe[+el.dataset.k];r[k.slice(5)]=Math.max(0,+el.value||0);if(k==='riga.qty'&&r.qty<1)r.qty=1;render();return}
+ if(k.startsWith('reg.')){const pth=k.slice(4).split('.');if(pth.length===1)S.regole[pth[0]]=+el.value;else S.regole[pth[0]][pth[1]]=+el.value;log('Regola preventivi modificata: '+k.slice(4)+' = '+el.value);render()}});
+document.addEventListener('input',e=>{if(e.target.dataset.dup)dupCheck();if(e.target.id==='pal-in'){palSel=0;palRun()}});
+document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();A.pal()}
+ if(e.key==='Escape')closeM();
+ if($('#pal-in')&&['ArrowDown','ArrowUp','Enter'].includes(e.key)){e.preventDefault();if(e.key==='Enter')return A.palGo({k:palSel});palSel=Math.max(0,palSel+(e.key==='ArrowDown'?1:-1));palRun()}
+ if(e.key==='Enter'&&e.target.id==='searchbox')A.pal()});
+document.addEventListener('dragstart',e=>{const c=e.target.closest('[data-drag]');if(c)e.dataTransfer.setData('text/plain',c.dataset.drag)});
+document.addEventListener('dragover',e=>{const c=e.target.closest('[data-drop]');if(c){e.preventDefault();c.classList.add('drop')}});
+document.addEventListener('dragleave',e=>{const c=e.target.closest('[data-drop]');if(c)c.classList.remove('drop')});
+document.addEventListener('drop',e=>{const c=e.target.closest('[data-drop]');if(!c)return;e.preventDefault();const t=S.trattative.find(x=>x.id===e.dataTransfer.getData('text/plain'));if(t){t.fase=c.dataset.drop;t.ferma=false;toast(`${CL(t.cli).nome}: fase «${FASI.find(f=>f[0]===t.fase)[1]}»`);render()}});
+const TOUR=[
+ ['Il cliente chiama','R. Gialli registra la telefonata: il CRM riconosce che Rossi Impianti esiste già e apre la sua scheda, senza doppioni.',()=>{S=seed();S.me='rg';go('clienti','C1')}],
+ ['Il responsabile prepara il preventivo','M. Bianchi, responsabile della pratica, parte dal modello «Postazione ufficio CAD». Il listino Aziende B si applica da solo.',()=>{S.me='mb';go('clienti','C1');A.nuovoPv({c:'C1'});A.creaPv()}],
+ ['Ogni parte è dettagliata','Workstation con tutti i componenti, monitor, installazione e, a parte, i canoni mensili di stampante a noleggio e software. Metto uno sconto dell\'8%.',()=>{const p=curPv();p.righe[0].sc=8;p.righe[1].sc=5;render()}],
+ ['Lo sconto supera il limite del ruolo','Il commerciale può dare fino al 5%: il preventivo va all\'amministratore con il motivo scritto. Entro i limiti, invece, partirebbe subito.',()=>A.pvInvia()],
+ ['L\'amministratore approva con un clic','N. Bartoli vede il motivo e approva. Non deve fare lui il preventivo: controlla solo le eccezioni.',()=>{S.me='nb';go('preventivi',S.preventivi[0].id);A.appr()}],
+ ['Come lo vede il cliente','M. Bianchi lo invia. Il cliente apre una pagina chiara: cosa paga una volta, cosa ogni mese.',()=>{S.me='mb';go('preventivi',S.preventivi[0].id);A.pvMail();A.portale()}],
+ ['Il cliente accetta e firma online','Si registrano nome, data e versione. Nasce l\'ordine del cliente, collegato al preventivo.',()=>{A.portale();A.accetta();go('ordini',S.preventivi[0].ord)}],
+ ['Il CRM trova i pezzi','S. Conti (logistica) chiede la proposta: prima il Centrale, poi gli altri negozi, poi il fornitore più rapido.',()=>{S.me='sc';go('ordini',S.preventivi[0].ord);A.proponi()}],
+ ['Trasferimenti con bolla e tracking','Riserve, trasferimenti tra sedi con DDT e corriere, ordine al fornitore: tutto creato in un passo.',()=>{A.applica();go('magazzini')}],
+ ['Pezzo riservato: bloccato','Un trasferimento tra negozi non chiede autorizzazioni, ma l\'SSD riservato per un altro ordine non parte e il tecnico viene avvisato.',()=>{let g=0;while(S.trasf.some(t=>t.stato!=='Ricevuto'&&t.righe.some(r=>r.sped))&&g++<20)S.trasf.filter(t=>t.stato!=='Ricevuto'&&t.righe.some(r=>r.sped)).forEach(t=>A.avanza({t:t.id}));A.nuovoTr();A.creaTr()}],
+ ['Telefonata al fornitore e merce ricevuta','Si sa chi ha chiamato e chi ha registrato. La merce arriva al Centrale e si riserva da sola per l\'ordine.',()=>{go('fornitori');S.calls.push({id:'TEL-099',q:now(),forn:'Beta Informatica',chi:'sc',reg:'sc',comm:S.preventivi[0].ord,esito:'Confermato 1 SSD, arrivo in 2 giorni',orig:'Centralino'});S.po.forEach(p=>p.stato!=='Ricevuto'&&A.ricevi({p:p.id}))}],
+ ['Il tecnico assembla','L. Marini decide sul blocco, avvia l\'assemblaggio e registra i seriali: ogni PC è tracciabile.',()=>{S.me='lm';S.avvisi.filter(a=>a.blocco&&!a.chiuso).forEach(a=>A.mantieni({id:a.id}));const o=S.preventivi[0].ord;A.avvia({o});A.seriali({o});go('assemblaggio')}],
+ ['Spedito e consegnato','La logistica spedisce con tracking e segna la consegna. La pratica del cliente è chiusa.',()=>{S.me='sc';go('ordini',S.preventivi[0].ord);A.spedisci();A.consegna()}],
+ ['Dati al commercialista','Il CRM non fattura: A. Conti completa il codice SDI mancante e invia i documenti allo studio.',()=>{S.me='ac';CL('C1').sdi='M5UXCR1';S.docs.forEach(d=>d.stato==='Da inviare'&&A.inviaDoc({d:d.id}));go('commercialista')}],
+ ['Il capo vede tutto','Panoramica, deleghe, stampanti in leasing e registro modifiche: nessuno deve cercare altro.',()=>{S.me='nb';go('dash')}]];
+let tourI=-1;
+function tourShow(){const t=$('#tour');if(tourI<0){t.style.display='none';return}const x=TOUR[tourI];t.style.display='block';
+ t.innerHTML=`<div class="pg"><b style="width:${(tourI+1)/TOUR.length*100}%"></b></div><div class="tn">Passo ${tourI+1} di ${TOUR.length} · ${esc(ME().n)}</div><h3>${esc(x[0])}</h3><p>${esc(x[1])}</p><div class="row"><button class="btn sm" data-a="tourEsci">Esci</button><span class="sp"></span>${tourI<TOUR.length-1?'<button class="btn pri" data-a="tourNext" id="tour-next">Avanti →</button>':'<button class="btn ok" data-a="tourEsci">Fine ✓</button>'}</div>`}
+A.tour=()=>{closeM();tourI=0;TOUR[0][2]();tourShow()};
+A.tourNext=()=>{closeM();tourI++;TOUR[tourI][2]();tourShow()};
+A.tourEsci=()=>{tourI=-1;tourShow()};
+window.__cap=(t,s)=>{const c=$('#cap');if(!t){c.style.display='none';return}c.innerHTML=esc(t)+(s?`<small>${esc(s)}</small>`:'');c.style.display='block';const tv=$('#tour').style.display==='block';c.style.bottom=tv?'auto':'26px';c.style.top=tv?'76px':'auto'};
+window.__S=()=>S;
+render();
+}
+</script>
 </body>
 </html>
